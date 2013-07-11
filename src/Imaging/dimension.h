@@ -3,6 +3,8 @@
 
 #include <array>
 
+#include "coordinates.h"
+
 namespace Imaging
 {
 	/* Presents the dimension of an image by the number of elements.
@@ -16,8 +18,8 @@ namespace Imaging
 		////////////////////////////////////////////////////////////////////////////////////
 		// Default constructors.
 		Dimension(void);
-		Dimension(const Dimension &src);
-		Dimension &operator=(const Dimension &src);
+		Dimension(const Dimension<T> &src);
+		Dimension<T> &operator=(const Dimension<T> &src);
 
 		////////////////////////////////////////////////////////////////////////////////////
 		// Custom constructors.
@@ -25,8 +27,8 @@ namespace Imaging
 
 		////////////////////////////////////////////////////////////////////////////////////
 		// Operators.
-		bool operator==(const Dimension &src) const;
-		bool operator!=(const Dimension &src) const;
+		bool operator==(const Dimension<T> &src) const;
+		bool operator!=(const Dimension<T> &src) const;
 
 		////////////////////////////////////////////////////////////////////////////////////
 		// Methods.
@@ -62,11 +64,11 @@ namespace Imaging
 	Dimension<T>::Dimension(void) : width(0), height(0), depth(0) {}
 
 	template <typename T>
-	Dimension<T>::Dimension(const Dimension &src) :
+	Dimension<T>::Dimension(const Dimension<T> &src) :
 		width(src.width), height(src.height), depth(src.depth) {}
 
 	template <typename T>
-	Dimension<T> &Dimension<T>::operator=(const Dimension &src)
+	Dimension<T> &Dimension<T>::operator=(const Dimension<T> &src)
 	{
 		this->width = src.width;
 		this->height = src.height;
@@ -132,13 +134,65 @@ namespace Imaging
 		return x * this->depth + y * this->width * this->depth;
 	}
 
+	/** Represents a region of interest or an area of interest.
+	The dimension is defined as the number of pixels. */
 	template <typename T, typename U>
 	class Region
 	{
 	public:
+		////////////////////////////////////////////////////////////////////////////////////
+		// Default constructors.
+		Region(void);
+		Region(const Region<T, U> &src);
+		Region &operator=(const Region<T, U> &src);
+
+		////////////////////////////////////////////////////////////////////////////////////
+		// Custom constructors.
+		Region(const Cartesian2D<T> &origin, const Cartesian2D<U> &size);
+		Region(T x, T y, U width, U height);
+
+		////////////////////////////////////////////////////////////////////////////////////
+		// Accessors.
+		typename U &width, &height;
+
+		////////////////////////////////////////////////////////////////////////////////////
+		// Methods.
+		void Move(const Cartesian2D<T> &change);
+		void Zoom(const Cartesian2D<double> &zm);
+		void Zoom(double zm);
+
+		////////////////////////////////////////////////////////////////////////////////////
 		// Data.
-		//std::array<T, 2> x, y;
-		//U width, height;
+		Cartesian2D<T> origin;
+		Cartesian2D<U> size;
 	};
+
+	////////////////////////////////////////////////////////////////////////////////////////
+	// Default constructors.
+	template <typename T, typename U>
+	Region<T, U>::Region(void) : width(size.x), height(size.y) {}
+
+	template <typename T, typename U>
+	Region<T, U>::Region(const Region<T, U> &src) :
+		width(size.x), height(size.y), origin(src.origin), size(src.size) {}
+
+	template <typename T, typename U>
+	Region<T, U> &Region<T, U>::operator=(const Region<T, U> &src)
+	{
+		this->origin = src.origin;
+		this->size = src.size;
+		return *this;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////
+	// Custom constructors.
+	template <typename T, typename U>
+	Region<T, U>::Region(const Cartesian2D<T> &origin, const Cartesian2D<U> &size) :
+		width(size.x), height(size.y), origin(origin), size(size) {}
+
+	// Delegation constructors are possible only from VS2013, so this won't work for now.
+	template <typename T, typename U>
+	Region<T, U>::Region(T x, T y, U width, U height) :
+		Region<T, U>(Cartesian2D<T>(x, y), Cartesian2D<U>(width, height)) {}
 }
 #endif
