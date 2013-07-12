@@ -4,6 +4,9 @@
 namespace Imaging
 {
 	////////////////////////////////////////////////////////////////////////////////////////
+	// Dimension<T>
+
+	////////////////////////////////////////////////////////////////////////////////////////
 	// Default constructors.
 
 	template <typename T>
@@ -83,6 +86,7 @@ namespace Imaging
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Default constructors.
+
 	template <typename T, typename U>
 	Region<T, U>::Region(void) : width(size.x), height(size.y) {}
 
@@ -100,6 +104,7 @@ namespace Imaging
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Custom constructors.
+
 	template <typename T, typename U>
 	Region<T, U>::Region(const Cartesian2D<T> &origin, const Cartesian2D<U> &size) :
 		width(size.x), height(size.y), origin(origin), size(size) {}
@@ -107,6 +112,27 @@ namespace Imaging
 	// Delegation constructors are possible only from VS2013, so this won't work for now.
 	template <typename T, typename U>
 	Region<T, U>::Region(T x, T y, U width, U height) :
-		Region<T, U>(Cartesian2D<T>(x, y), Cartesian2D<U>(width, height)) {}
+		//Region<T, U>(Cartesian2D<T>(x, y), Cartesian2D<U>(width, height)) {}	// for VS2013
+		width(size.x), height(size.y),
+		origin(Cartesian2D<T>(x, y)), size(Cartesian2D<U>(width, height)) {}	// for VS2012
+
+	////////////////////////////////////////////////////////////////////////////////////////
+	// Methods.
+
+	template <typename T, typename U>
+	Region<T, U> Region<T, U>::Move(const Cartesian2D<T> &change) const
+	{
+		Region<T, U> dst = *this;
+		Add(this->origin, change, dst.origin);
+		return dst;
+	}
+
+	template <typename T, typename U>
+	Region<T, U> Region<T, U>::Zoom(const Cartesian2D<double> &zm) const
+	{
+		Region<T, U> dst = *this;
+		Multiply(this.size, zm, dst.size);
+		return dst;
+	}
 }
 #endif

@@ -60,6 +60,8 @@ namespace Imaging
 
 	/** Represents a region of interest or an area of interest.
 	The dimension is defined as the number of pixels. */
+	/** TODO: How do we restrict data type of U as unsigned ? 
+	-> No we shouldn't. U could be float. */
 	template <typename T, typename U>
 	class Region
 	{
