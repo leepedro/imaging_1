@@ -122,7 +122,7 @@ namespace Imaging
 	template <typename T, typename U>
 	Region<T, U> Region<T, U>::Move(const Cartesian2D<T> &change) const
 	{
-		Region<T, U> dst = *this;
+		Region<T, U> dst(*this);
 		Add(this->origin, change, dst.origin);
 		return dst;
 	}
@@ -130,7 +130,7 @@ namespace Imaging
 	template <typename T, typename U>
 	Region<T, U> Region<T, U>::Zoom(const Cartesian2D<double> &zm) const
 	{
-		Region<T, U> dst = *this;
+		Region<T, U> dst(*this);
 		Multiply(this.size, zm, dst.size);
 		return dst;
 	}
