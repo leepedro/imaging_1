@@ -2,9 +2,31 @@
 #define UTILITIES_H
 
 #include <array>
+#include <algorithm>
 
 namespace Imaging
 {
+	/** Copies an std::array<> object to another one with different data types and the same
+	number of elements.
+	This function template is enabled for only between the data types that implicit
+	conversion is allowed.
+	1) integer -> floating && src < dst
+	2) floating -> floating && src <= dst
+	2) integer -> integer && {u -> u || s -> s} && src <= dst */
+	template <typename T, typename U, ::size_t N>
+	typename std::enable_if<	
+		(std::is_integral<T>::value && std::is_floating_point<U>::value && sizeof(T) < sizeof(U)) ||
+		(std::is_floating_point<T>::value && std::is_floating_point<U>::value &&
+		sizeof(T) <= sizeof(U)) ||
+		(std::is_integral<T>::value && std::is_integral<U>::value &&
+		((std::is_unsigned<T>::value && std::is_unsigned<U>::value) ||
+		(std::is_signed<T>::value && std::is_signed<U>::value)) &&
+		sizeof(T) <= sizeof(U)), void>::type
+	Copy(const std::array<T, N> &src, std::array<U, N> &dst)
+	{
+		std::copy(src.cbegin(), src.cend(), dst.begin());
+	}
+
 	// safe add
 
 	// safe convert (?)
@@ -35,7 +57,6 @@ namespace Imaging
 	template <typename T, ::size_t N>
 	void Multiply(const std::array<T, N> &a, double b, std::array<T, N> &c);
 
-	/** TODO: How do we check the sign of the result ? -> No need? */
 	/** TODO: Should we round off? -> Yes. */
 	template <typename T, ::size_t N>
 	void Multiply(const std::array<T, N> &a, double b, std::array<T, N> &c)
