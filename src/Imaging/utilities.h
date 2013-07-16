@@ -27,6 +27,9 @@ namespace Imaging
 		std::copy(src.cbegin(), src.cend(), dst.begin());
 	}
 
+
+	// TODO: Add SafeCast() and Round().
+
 	// safe add
 
 	// safe convert (?)
