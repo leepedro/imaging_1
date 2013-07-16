@@ -5,6 +5,7 @@
 
 namespace Imaging
 {
+	// TODO: Add SafeCast() and Round().
 	// safe add
 
 	// safe convert (?)
