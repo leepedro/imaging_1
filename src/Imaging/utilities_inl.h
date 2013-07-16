@@ -1,0 +1,75 @@
+#if !defined(UTILITIES_INL_H)
+#define UTILITIES_INL_H
+
+namespace Imaging
+{
+	////////////////////////////////////////////////////////////////////////////////////////
+	// Global functions for std::array<T, N>
+
+	/** <cmath> of C+11 supports std::round(), but VS2012 does not support it yet.
+	The 'round-off from zero' algorithm, which is equivalent to the C+11 round(), is
+	implemented using std::floor() and std::ceil(). */
+	template <typename T, typename U, ::size_t N>
+	typename std::enable_if<std::is_floating_point<T>::value, void>::type
+	RoundAs(const std::array<T, N> &src, std::array<U, N> &dst)
+	{
+		for (auto it_src = src.cbegin(), it_dst = dst.begin(), it_dst_end = dst.end();
+			it_dst != it_dst_end; ++it_src, ++it_dst)
+#if _MSC_VER > 1700	// from C+11
+			SafeCast(std::round(*it_src), *it_dst);
+#else				// up to VS2012
+			if (*it_src >= 0)
+				SafeCast(std::floor(*it_src + 0.5), *it_dst);
+			else
+				SafeCast(std::ceil(*it_src - 0.5), *it_dst);
+#endif
+	}
+
+	/** This function template implements an implicit data type conversion, so the
+	destination data type U must be the same or wider than the source data type T. */
+	template <typename T, typename U, ::size_t N>
+	void Add(const std::array<T, N> &a, const std::array<T, N> &b, std::array<U, N> &c)
+	{
+		for (auto it_a = a.cbegin(), it_b = b.cbegin(), it_c = c.begin(), it_c_end = c.end();
+			it_c != it_c_end; ++it_a, ++it_b, ++it_c)
+			*it_c = *it_a + *it_b;
+	}
+
+	template <typename T, ::size_t N>
+	std::array<double, N> Multiply(const std::array<T, N> &a, double b)
+	{
+		std::array<double, N> dst;
+		for (auto it_a = a.cbegin(), it_dst = dst.begin(), it_dst_end = dst.end();
+			it_dst != it_dst_end; ++it_a, ++it_dst)
+			*it_dst_end = *it_a * b;
+		return dst;
+	}
+
+	template <typename T, ::size_t N>
+	std::array<double, N> Multiply(const std::array<T, N> &a, const std::array<double, N> &b)
+	{
+		std::array<double, N> dst;
+		for (auto it_a = a.cbegin(), it_b = b.cbegin(), it_dst = dst.begin(),
+			it_dst_end = dst.end();	it_dst != it_dst_end; ++it_a, ++it_b, ++it_dst)
+			*it_dst_end = *it_a * *it_b;
+		return dst;
+	}
+
+	template <typename T, ::size_t N>
+	double GetNorm(const std::array<T, N> &src, double p)
+	{
+		double sum(0.0);
+		for (auto it = src.cbegin(), it_end = src.cend(); it != it_end; ++it)
+			sum += ::pow(*it, p);
+		return ::pow(sum, 1.0 / p);
+	}
+
+	template <typename T, ::size_t N>
+	std::array<double, N> Normalize(const std::array<T, N> &src, double p)
+	{
+		double norm = GetNorm(src, p);
+		return Multiply(src, 1 / norm);
+	}
+}
+
+#endif

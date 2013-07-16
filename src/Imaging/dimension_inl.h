@@ -112,9 +112,12 @@ namespace Imaging
 	// Delegation constructors are possible only from VS2013, so this won't work for now.
 	template <typename T, typename U>
 	Region<T, U>::Region(T x, T y, U width, U height) :
-		//Region<T, U>(Cartesian2D<T>(x, y), Cartesian2D<U>(width, height)) {}	// for VS2013
+#if _MSC_VER > 1700	// from VS2013
+		Region<T, U>(Cartesian2D<T>(x, y), Cartesian2D<U>(width, height)) {}	// for VS2013
+#else				// up to VS2012
 		width(size.x), height(size.y),
 		origin(Cartesian2D<T>(x, y)), size(Cartesian2D<U>(width, height)) {}	// for VS2012
+#endif
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Methods.
@@ -131,7 +134,7 @@ namespace Imaging
 	Region<T, U> Region<T, U>::Zoom(const Cartesian2D<double> &zm) const
 	{
 		Region<T, U> dst(*this);
-		Multiply(this.size, zm, dst.size);
+		RoundAs(Multiply(this.size, zm), dst.size);
 		return dst;
 	}
 }

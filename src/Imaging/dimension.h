@@ -4,6 +4,7 @@
 #include <array>
 
 #include "coordinates.h"
+#include "utilities.h"
 
 namespace Imaging
 {

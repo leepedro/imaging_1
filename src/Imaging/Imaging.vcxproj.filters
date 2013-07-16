@@ -36,5 +36,8 @@
     <ClInclude Include="dimension_inl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="utilities_inl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
