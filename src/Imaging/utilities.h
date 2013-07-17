@@ -12,16 +12,16 @@ namespace Imaging
 	/** Casts source values to given destination data type while throwing an exception if
 	an integer overflow was about to happen.
 
-	The compiler warning messages for narrower conversions are silenced by static_cast.
+	The compiler warning messages for narrower conversions are silenced by static_cast<T>.
 
 	static_cast<T> is implemented even for the cases that an implicit conversion can work.
 	
 	The destination value remains unchanged if an exception was thrown.
-	Q. Would it matter any way?
 
 	@param [in] src
 	@param [out] dst
-	@exception std::overflow_error	if source value is negative value while destination 
+	@exception std::overflow_error	if source value is negative value while destination
+	data type is unsigned, or if source value is beyond the range of destination data type
 
 	Two kinds of integer overflow risks are possible.
 
@@ -112,16 +112,33 @@ namespace Imaging
 		dst = static_cast<U>(src);
 	}
 
+	/** Adds two values into one while checking integer overflow.
+	@param [in] a
+	@param [in] b
+	@param [out] c = a + b
+	@exception std::overflow_error	if the result is below or beyond the range of
+	destination data type
+	*/
+	template <typename T, typename U>
+	typename std::enable_if<
+		std::is_arithmetic<T>::value && std::is_arithmetic<U>::value, void>::type
+		SafeAdd(const T &a, const U &b, T &c);
+
+
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Global functions for std::array<T, N>
 
 	/** Copies an std::array<> object to another one with different data types.
 
 	This function template is enabled for only between the data types that implicit
-	conversion is allowed.
+	conversion is safely allowed.
 	1) integer -> floating && src < dst
 	2) floating -> floating && src <= dst
 	2) integer -> integer && {u -> u || s -> s} && src <= dst */
+	/** Compiler gives a warning against int -> float, so it is disabled by enforcing
+	src < dst in case 1.
+	Since only implicitly allowed conversion is enabled, there is no need to use a safe
+	casting method. */
 	template <typename T, typename U, ::size_t N>
 	typename std::enable_if<	
 		(std::is_integral<T>::value && std::is_floating_point<U>::value && sizeof(T) < sizeof(U)) ||
@@ -142,7 +159,7 @@ namespace Imaging
 	*/
 	template <typename T, typename U, ::size_t N>
 	typename std::enable_if<std::is_floating_point<T>::value, void>::type
-	RoundAs(const std::array<T, N> &src, std::array<U, N> &dst);
+		RoundAs(const std::array<T, N> &src, std::array<U, N> &dst);
 
 	// Add a safe add function ?
 

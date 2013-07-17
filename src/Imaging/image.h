@@ -39,17 +39,15 @@ namespace Imaging
 
 		//////////////////////////////////////////////////
 		// Accessors.
-		/** Accesses image data for given coordinate (x, y) by a reference. */
-		T &operator()(SizeType x, SizeType y);
 
 		/** Accesses image data for given coordinate (x, y) by a reference. */
+		T &operator()(SizeType x, SizeType y);
 		const T &operator()(SizeType x, SizeType y) const;
 
 		/** Accesses image data for given coordinate (x, y) by an iterator. */
 		Iterator GetIterator(SizeType x, SizeType y);
-
-		/** Accesses image data for given coordinate (x, y) by an iterator. */
 		ConstIterator GetIterator(SizeType x, SizeType y) const;
+
 		const SizeType &width, &height, &depth;
 		const std::vector<T> &data;
 		const Dimension<SizeType> &dim;
@@ -77,7 +75,11 @@ namespace Imaging
 
 	template <typename T>
 	Image<T>::Image(const Image<T> &src) :
+#if _MSC_VER > 1700	// from VS2013
+		Image<T>(),
+#else				// up to VS2012
 		width(dim_.width), height(dim_.height), depth(dim_.depth), data(data_), dim(dim_),
+#endif
 		data_(src.data), dim_(src.dim) {}
 
 	template <typename T>
@@ -92,14 +94,22 @@ namespace Imaging
 	// Custom constructors.
 	template <typename T>
 	Image<T>::Image(const Dimension<SizeType>& d) :
+#if _MSC_VER > 1700	// from VS2013
+		Image<T>()
+#else				// up to VS2012
 		width(dim_.width), height(dim_.height), depth(dim_.depth), data(data_), dim(dim_)
+#endif
 	{
 		this->resize(d);
 	}
 
 	template <typename T>
 	Image<T>::Image(SizeType w, SizeType h, SizeType d) :
+#if _MSC_VER > 1700	// from VS2013
+		Image<T>()
+#else				// up to VS2012
 		width(dim_.width), height(dim_.height), depth(dim_.depth), data(data_), dim(dim_)
+#endif
 	{
 		this->resize(Dimension<SizeType>(w, h, d));
 	}

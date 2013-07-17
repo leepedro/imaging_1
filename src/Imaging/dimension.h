@@ -61,8 +61,6 @@ namespace Imaging
 
 	/** Represents a region of interest or an area of interest.
 	The dimension is defined as the number of pixels. */
-	/** TODO: How do we restrict data type of U as unsigned ? 
-	-> No we shouldn't. U could be float. */
 	template <typename T, typename U>
 	class Region
 	{
@@ -84,13 +82,23 @@ namespace Imaging
 
 		////////////////////////////////////////////////////////////////////////////////////
 		// Operators.
+
+		/** Moves the origin by the given distance, and returns the result as a new
+		Region<T, U> without changing this object. */
 		Region<T, U> operator+(const Cartesian2D<T> &dist) const;
+
+		/** Zooms the size by the given zoom rate without moving the origin., and returns
+		the result as a new Region<T, U> without changing this object. */
 		Region<T, U> operator*(const Cartesian2D<double> &zm) const;
 		Region<T, U> operator*(double zm) const;
 
 		////////////////////////////////////////////////////////////////////////////////////
 		// Methods.
+
+		/** Moves the origin by the given distance. */
 		void Move(const Cartesian2D<T> &dist);
+
+		/** Zooms the size by the given zoom rate without moving the origin. */
 		void Zoom(const Cartesian2D<double> &zm);
 		void Zoom(double zm);
 

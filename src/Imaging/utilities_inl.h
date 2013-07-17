@@ -3,6 +3,18 @@
 
 namespace Imaging
 {
+	template <typename T, typename U>
+	typename std::enable_if<
+		std::is_arithmetic<T>::value && std::is_arithmetic<U>::value, void>::type
+		SafeAdd(const T &a, const U &b, T &c)
+	{
+		if (b > 0 && a > (std::numeric_limits<T>::max() - b))
+			throw std::overflow_error("Result value is too high.");
+		else if (b < 0 && a < (std::numeric_limits<T>::min() - b))
+			throw std::overflow_error("Result value is too low.");
+		SafeCast(a + b, c);
+	}
+
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Global functions for std::array<T, N>
 
@@ -11,7 +23,7 @@ namespace Imaging
 	implemented using std::floor() and std::ceil(). */
 	template <typename T, typename U, ::size_t N>
 	typename std::enable_if<std::is_floating_point<T>::value, void>::type
-	RoundAs(const std::array<T, N> &src, std::array<U, N> &dst)
+		RoundAs(const std::array<T, N> &src, std::array<U, N> &dst)
 	{
 		for (auto it_src = src.cbegin(), it_dst = dst.begin(), it_dst_end = dst.end();
 			it_dst != it_dst_end; ++it_src, ++it_dst)
