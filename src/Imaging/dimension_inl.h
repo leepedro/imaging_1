@@ -120,22 +120,52 @@ namespace Imaging
 #endif
 
 	////////////////////////////////////////////////////////////////////////////////////////
-	// Methods.
+	// Operators.
 
 	template <typename T, typename U>
-	Region<T, U> Region<T, U>::Move(const Cartesian2D<T> &change) const
+	Region<T, U> Region<T, U>::operator+(const Cartesian2D<T> &dist) const
 	{
 		Region<T, U> dst(*this);
-		Add(this->origin, change, dst.origin);
+		Add(this->origin, dist, dst.origin);
 		return dst;
 	}
 
 	template <typename T, typename U>
-	Region<T, U> Region<T, U>::Zoom(const Cartesian2D<double> &zm) const
+	Region<T, U> Region<T, U>::operator*(const Cartesian2D<double> &zm) const
 	{
 		Region<T, U> dst(*this);
 		RoundAs(Multiply(this.size, zm), dst.size);
 		return dst;
+	}
+
+	template <typename T, typename U>
+	Region<T, U> Region<T, U>::operator*(double zm) const
+	{
+		Region<T, U> dst(*this);
+		RoundAs(Multiply(this.size, zm), dst.size);
+		return dst;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////
+	// Methods.
+
+	template <typename T, typename U>
+	void Region<T, U>::Move(const Cartesian2D<T> &dist)
+	{
+		Add(this->origin, dist, this->origin);
+	}
+
+
+	template <typename T, typename U>
+	void Region<T, U>::Zoom(const Cartesian2D<double> &zm)
+	{
+		RoundAs(Multiply(this.size, zm), this->size);
+	}
+
+	template <typename T, typename U>
+	void Region<T, U>::Zoom(double zm)
+	{
+		RoundAs(Multiply(this.size, zm), this->size);
 	}
 }
 #endif

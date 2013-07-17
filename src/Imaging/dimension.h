@@ -83,10 +83,16 @@ namespace Imaging
 		typename U &width, &height;
 
 		////////////////////////////////////////////////////////////////////////////////////
+		// Operators.
+		Region<T, U> operator+(const Cartesian2D<T> &dist) const;
+		Region<T, U> operator*(const Cartesian2D<double> &zm) const;
+		Region<T, U> operator*(double zm) const;
+
+		////////////////////////////////////////////////////////////////////////////////////
 		// Methods.
-		Region<T, U> Move(const Cartesian2D<T> &change) const;
-		Region<T, U> Zoom(const Cartesian2D<double> &zm) const;
-		Region<T, U> Zoom(double zm) const;
+		void Move(const Cartesian2D<T> &dist);
+		void Zoom(const Cartesian2D<double> &zm);
+		void Zoom(double zm);
 
 		////////////////////////////////////////////////////////////////////////////////////
 		// Data.
