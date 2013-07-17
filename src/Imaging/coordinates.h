@@ -3,6 +3,10 @@
 
 namespace Imaging
 {
+	/* TODO: Design Cartesian<T, N> class derived from std::array<T, N>.
+	Then, Design Point2D<T>, Point3D<T>, and Size2D<T> classes derived from Cartessian<T, N>.
+	The last layer of classes should have {x, y}, {x, y, z}, {width, height}.
+	*/
 	/** Presents a 2-D Cartesian coordinate as (x, y). */
 	template <typename T>
 	class Cartesian2D : public std::array<T, 2>
