@@ -16,8 +16,6 @@ namespace Imaging
 
 	static_cast<T> is implemented even for the cases that an implicit conversion can work.
 	
-	The destination value remains unchanged if an exception was thrown.
-
 	@param [in] src
 	@param [out] dst
 	@exception std::overflow_error	if source value is negative value while destination
@@ -113,6 +111,8 @@ namespace Imaging
 	}
 
 	/** Adds two values into one while checking integer overflow.
+	The internal explicit conversion silences any compiler warning messages regarding
+	data type conversion.
 	@param [in] a
 	@param [in] b
 	@param [out] c = a + b
@@ -160,7 +160,11 @@ namespace Imaging
 	}
 
 	/** Adds two std::array<T, N> objects of the same data type and length into another
-	std::array<T, N> object of the same data type. */
+	std::array<T, N> object of the same data type.
+	@NOTE This operator can be practically used only within the namespace because we cannot
+	use '+' without "using namespace Imaging". (Maybe it is better that way.)
+	Another way is 'c = Imaging::operator+(a, b)', but function Add() is better in that way.
+	*/
 	template <typename T, ::size_t N>
 	std::array<T, N> operator+(const std::array<T, N> &a, const std::array<T, N> &b);
 
@@ -176,9 +180,9 @@ namespace Imaging
 
 	/** Adds two std::array<T, N> objects of the same data type and length into another
 	std::array<U, N> object of a different (or same) data type. */
-	/* TODO: This function won't work for U. */
-	template <typename T, typename U, ::size_t N>
-	void Add(const std::array<T, N> &a, const std::array<T, N> &b, std::array<U, N> &c);
+	template <typename T, typename U, typename S, ::size_t N>
+	typename std::enable_if<sizeof(T) <= sizeof(S) && sizeof(U) <= sizeof(S), void>::type
+		Add(const std::array<T, N> &a, const std::array<U, N> &b, std::array<S, N> &c);
 
 	/** Multiplies an std::array<T, N> with a (double) scalar as c = a * b.
 

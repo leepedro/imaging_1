@@ -25,7 +25,7 @@ namespace Imaging
 		auto it_c = c.begin(), it_c_end = c.end();
 		for (auto it_a = a.cbegin(), it_b = b.cbegin();
 			it_c != it_c_end; ++it_a, ++it_b, ++it_c)
-			*it_c = *it_a + *it_b;
+			*it_c = *it_a + *it_b;	// This part is not protected against overflow.
 		return c;
 	}
 
@@ -36,8 +36,8 @@ namespace Imaging
 	typename std::enable_if<std::is_floating_point<T>::value, void>::type
 		RoundAs(const std::array<T, N> &src, std::array<U, N> &dst)
 	{
-		for (auto it_src = src.cbegin(), it_dst = dst.begin(), it_dst_end = dst.end();
-			it_dst != it_dst_end; ++it_src, ++it_dst)
+		auto it_dst = dst.begin(), it_dst_end = dst.end();
+		for (auto it_src = src.cbegin(); it_dst != it_dst_end; ++it_src, ++it_dst)
 #if _MSC_VER > 1700	// from C+11
 			SafeCast(std::round(*it_src), *it_dst);
 #else				// up to VS2012
@@ -48,16 +48,16 @@ namespace Imaging
 #endif
 	}
 
-	/** This function template implements an implicit data type conversion, so the
-	destination data type U must be the same or wider than the source data type T. */
-	template <typename T, typename U, ::size_t N>
-	void Add(const std::array<T, N> &a, const std::array<T, N> &b, std::array<U, N> &c)
+	/** This function template implicitly converts two source data into their widest one,
+	and then copy the result into destination data, so S should be the same or wider than	
+	both of T and U. */
+	template <typename T, typename U, typename S, ::size_t N>
+	typename std::enable_if<sizeof(T) <= sizeof(S) && sizeof(U) <= sizeof(S), void>::type
+		Add(const std::array<T, N> &a, const std::array<U, N> &b, std::array<S, N> &c)
 	{
 		auto it_c = c.begin(), it_c_end = c.end();
 		for (auto it_a = a.cbegin(), it_b = b.cbegin();
 			it_c != it_c_end; ++it_a, ++it_b, ++it_c)
-			// TODO: No! Following line won't work for different data type U because
-			// the addition "*it_a + *it_b" is already completed as T leading an overflow.
 			*it_c = *it_a + *it_b;
 	}
 
@@ -65,8 +65,8 @@ namespace Imaging
 	std::array<double, N> Multiply(const std::array<T, N> &a, double b)
 	{
 		std::array<double, N> dst;
-		for (auto it_a = a.cbegin(), it_dst = dst.begin(), it_dst_end = dst.end();
-			it_dst != it_dst_end; ++it_a, ++it_dst)
+		auto it_dst = dst.begin(), it_dst_end = dst.end();
+		for (auto it_a = a.cbegin(); it_dst != it_dst_end; ++it_a, ++it_dst)
 			*it_dst_end = *it_a * b;
 		return dst;
 	}
@@ -75,8 +75,9 @@ namespace Imaging
 	std::array<double, N> Multiply(const std::array<T, N> &a, const std::array<double, N> &b)
 	{
 		std::array<double, N> dst;
-		for (auto it_a = a.cbegin(), it_b = b.cbegin(), it_dst = dst.begin(),
-			it_dst_end = dst.end();	it_dst != it_dst_end; ++it_a, ++it_b, ++it_dst)
+		auto it_dst = dst.begin(),	it_dst_end = dst.end();
+		for (auto it_a = a.cbegin(), it_b = b.cbegin();	it_dst != it_dst_end;
+			++it_a, ++it_b, ++it_dst)
 			*it_dst_end = *it_a * *it_b;
 		return dst;
 	}

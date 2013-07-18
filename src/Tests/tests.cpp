@@ -27,6 +27,7 @@ int main(void)
 	try
 	{
 		TestCoordinates();
+		TestUtilities();
 		TestImage1<unsigned char>();
 	}
 	catch (const std::exception &ex)
