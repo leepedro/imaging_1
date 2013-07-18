@@ -34,7 +34,7 @@ namespace Imaging
 
 		//////////////////////////////////////////////////
 		// Custom constructors.
-		Image(const Dimension<SizeType>& d);
+		Image(const ImageSize<SizeType>& d);
 		Image(SizeType w, SizeType h, SizeType d = 1);
 
 		//////////////////////////////////////////////////
@@ -50,19 +50,19 @@ namespace Imaging
 
 		const SizeType &width, &height, &depth;
 		const std::vector<T> &data;
-		const Dimension<SizeType> &dim;
+		const ImageSize<SizeType> &dim;
 
 		//////////////////////////////////////////////////
 		// Methods.
 		void clear(void);
-		void resize(const Dimension<SizeType>& dim);
+		void resize(const ImageSize<SizeType>& dim);
 		void resize(SizeType w, SizeType h, SizeType d = 1);
 
 	protected:
 		//////////////////////////////////////////////////
 		// Data.
 		std::vector<T> data_;
-		Dimension<SizeType> dim_;
+		ImageSize<SizeType> dim_;
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -93,7 +93,7 @@ namespace Imaging
 	//////////////////////////////////////////////////////////////////////////
 	// Custom constructors.
 	template <typename T>
-	Image<T>::Image(const Dimension<SizeType>& d) :
+	Image<T>::Image(const ImageSize<SizeType>& d) :
 #if _MSC_VER > 1700	// from VS2013
 		Image<T>()
 #else				// up to VS2012
@@ -111,7 +111,7 @@ namespace Imaging
 		width(dim_.width), height(dim_.height), depth(dim_.depth), data(data_), dim(dim_)
 #endif
 	{
-		this->resize(Dimension<SizeType>(w, h, d));
+		this->resize(ImageSize<SizeType>(w, h, d));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -159,7 +159,7 @@ namespace Imaging
 	If dimension is changed while the total number of elements are the same (reshaping),
 	it does NOT run resize() function of the std::vector<T>. */
 	template <typename T>
-	void Image<T>::resize(const Dimension<SizeType>& dim)
+	void Image<T>::resize(const ImageSize<SizeType>& dim)
 	{
 		if (this->data_.size() != dim.GetNumElemPerFrame())
 			this->data_.resize(dim.GetNumElemPerFrame());
@@ -169,7 +169,7 @@ namespace Imaging
 	template <typename T>
 	void Image<T>::resize(SizeType w, SizeType h, SizeType d)
 	{
-		this->resize(Dimension<SizeType>(w, h, d));
+		this->resize(ImageSize<SizeType>(w, h, d));
 	}
 
 }

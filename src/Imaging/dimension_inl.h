@@ -4,20 +4,20 @@
 namespace Imaging
 {
 	////////////////////////////////////////////////////////////////////////////////////////
-	// Dimension<T>
+	// ImageSize<T>
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Default constructors.
 
 	template <typename T>
-	Dimension<T>::Dimension(void) : width(0), height(0), depth(0) {}
+	ImageSize<T>::ImageSize(void) : Size3D<T>(0, 0, 0) {}
 
 	template <typename T>
-	Dimension<T>::Dimension(const Dimension<T> &src) :
-		width(src.width), height(src.height), depth(src.depth) {}
+	ImageSize<T>::ImageSize(const ImageSize<T> &src) : Size3D<T>(src) {}
+		//width(src.width), height(src.height), depth(src.depth) {}
 
 	template <typename T>
-	Dimension<T> &Dimension<T>::operator=(const Dimension<T> &src)
+	ImageSize<T> &ImageSize<T>::operator=(const ImageSize<T> &src)
 	{
 		this->width = src.width;
 		this->height = src.height;
@@ -29,23 +29,23 @@ namespace Imaging
 	// Custom constructors.
 
 	template <typename T>
-	Dimension<T>::Dimension(T w, T h, T d): width(w), height(h), depth(d) {}
+	ImageSize<T>::ImageSize(T width, T height, T depth): Size3D<T>(width, height, depth) {}
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Operators.
 
-	template <typename T>
-	bool Dimension<T>::operator==(const Dimension &src) const
-	{
-		return this->width == src.width && this->height == src.height &&
-			this->depth == src.depth;
-	}
+	//template <typename T>
+	//bool ImageSize<T>::operator==(const ImageSize &src) const
+	//{
+	//	return this->width == src.width && this->height == src.height &&
+	//		this->depth == src.depth;
+	//}
 
-	template <typename T>
-	bool Dimension<T>::operator!=(const Dimension &src) const
-	{
-		return !(*this == src);
-	}
+	//template <typename T>
+	//bool ImageSize<T>::operator!=(const ImageSize &src) const
+	//{
+	//	return !(*this == src);
+	//}
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Methods.
@@ -53,7 +53,7 @@ namespace Imaging
 	/** Throws an exception instead of returning false because you have to throw an
 	exception at high level any way. */
 	template <typename T>
-	void Dimension<T>::CheckRange(T x, T y) const
+	void ImageSize<T>::CheckRange(T x, T y) const
 	{
 		if (x >= this->width || y >= this->height)
 			throw std::out_of_range("(x,y) is out of range.");
@@ -62,7 +62,7 @@ namespace Imaging
 	/** Enabled for only integral data types. Otherwise, the logic doesn't make sense.  */
 	template <typename T>
 	typename std::enable_if<std::is_integral<T>::value, T>::type
-		Dimension<T>::GetNumElemPerFrame(void) const
+		ImageSize<T>::GetNumElemPerFrame(void) const
 	{
 		return this->GetNumElemPerLine() * this->height;
 	}
@@ -70,7 +70,7 @@ namespace Imaging
 	/** Enabled for only integral data types. Otherwise, the logic doesn't make sense.  */
 	template <typename T>
 	typename std::enable_if<std::is_integral<T>::value, T>::type
-		Dimension<T>::GetNumElemPerLine(void) const
+		ImageSize<T>::GetNumElemPerLine(void) const
 	{
 		return this->depth * this->width;
 	}
@@ -78,7 +78,7 @@ namespace Imaging
 	/** Enabled for only integral data types. Otherwise, the logic doesn't make sense.  */
 	template <typename T>
 	typename std::enable_if<std::is_integral<T>::value, T>::type
-		Dimension<T>::GetOffset(T x, T y) const
+		ImageSize<T>::GetOffset(T x, T y) const
 	{
 		return x * this->depth + y * this->width * this->depth;
 	}
@@ -88,11 +88,11 @@ namespace Imaging
 	// Default constructors.
 
 	template <typename T, typename U>
-	Region<T, U>::Region(void) : width(size.x), height(size.y) {}
+	Region<T, U>::Region(void) {}
 
 	template <typename T, typename U>
 	Region<T, U>::Region(const Region<T, U> &src) :
-		width(size.x), height(size.y), origin(src.origin), size(src.size) {}
+		origin(src.origin), size(src.size) {}
 
 	template <typename T, typename U>
 	Region<T, U> &Region<T, U>::operator=(const Region<T, U> &src)
@@ -106,24 +106,23 @@ namespace Imaging
 	// Custom constructors.
 
 	template <typename T, typename U>
-	Region<T, U>::Region(const Cartesian2D<T> &origin, const Cartesian2D<U> &size) :
-		width(size.x), height(size.y), origin(origin), size(size) {}
+	Region<T, U>::Region(const Point2D<T> &origin, const Size2D<U> &size) :
+		origin(origin), size(size) {}
 
 	// Delegation constructors are possible only from VS2013, so this won't work for now.
 	template <typename T, typename U>
 	Region<T, U>::Region(T x, T y, U width, U height) :
 #if _MSC_VER > 1700	// from VS2013
-		Region<T, U>(Cartesian2D<T>(x, y), Cartesian2D<U>(width, height)) {}	// for VS2013
+		Region<T, U>(Point2D<T>(x, y), Size2D<U>(width, height)) {}	// for VS2013
 #else				// up to VS2012
-		width(size.x), height(size.y),
-		origin(Cartesian2D<T>(x, y)), size(Cartesian2D<U>(width, height)) {}	// for VS2012
+		origin(Point2D<T>(x, y)), size(Size2D<U>(width, height)) {}	// for VS2012
 #endif
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Operators.
 
 	template <typename T, typename U>
-	Region<T, U> Region<T, U>::operator+(const Cartesian2D<T> &dist) const
+	Region<T, U> Region<T, U>::operator+(const Point2D<T> &dist) const
 	{
 		Region<T, U> dst(*this);
 		Add(this->origin, dist, dst.origin);
@@ -131,7 +130,7 @@ namespace Imaging
 	}
 
 	template <typename T, typename U>
-	Region<T, U> Region<T, U>::operator*(const Cartesian2D<double> &zm) const
+	Region<T, U> Region<T, U>::operator*(const Point2D<double> &zm) const
 	{
 		Region<T, U> dst(*this);
 		RoundAs(Multiply(this.size, zm), dst.size);
@@ -150,14 +149,14 @@ namespace Imaging
 	// Methods.
 
 	template <typename T, typename U>
-	void Region<T, U>::Move(const Cartesian2D<T> &dist)
+	void Region<T, U>::Move(const Point2D<T> &dist)
 	{
 		Add(this->origin, dist, this->origin);
 	}
 
 
 	template <typename T, typename U>
-	void Region<T, U>::Zoom(const Cartesian2D<double> &zm)
+	void Region<T, U>::Zoom(const Point2D<double> &zm)
 	{
 		RoundAs(Multiply(this.size, zm), this->size);
 	}

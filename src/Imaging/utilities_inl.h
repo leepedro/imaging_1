@@ -18,6 +18,17 @@ namespace Imaging
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Global functions for std::array<T, N>
 
+	template <typename T, ::size_t N>
+	std::array<T, N> operator+(const std::array<T, N> &a, const std::array<T, N> &b)
+	{
+		std::array<T, N> c;
+		auto it_c = c.begin(), it_c_end = c.end();
+		for (auto it_a = a.cbegin(), it_b = b.cbegin();
+			it_c != it_c_end; ++it_a, ++it_b, ++it_c)
+			*it_c = *it_a + *it_b;
+		return c;
+	}
+
 	/** <cmath> of C+11 supports std::round(), but VS2012 does not support it yet.
 	The 'round-off from zero' algorithm, which is equivalent to the C+11 round(), is
 	implemented using std::floor() and std::ceil(). */
@@ -42,8 +53,11 @@ namespace Imaging
 	template <typename T, typename U, ::size_t N>
 	void Add(const std::array<T, N> &a, const std::array<T, N> &b, std::array<U, N> &c)
 	{
-		for (auto it_a = a.cbegin(), it_b = b.cbegin(), it_c = c.begin(), it_c_end = c.end();
+		auto it_c = c.begin(), it_c_end = c.end();
+		for (auto it_a = a.cbegin(), it_b = b.cbegin();
 			it_c != it_c_end; ++it_a, ++it_b, ++it_c)
+			// TODO: No! Following line won't work for different data type U because
+			// the addition "*it_a + *it_b" is already completed as T leading an overflow.
 			*it_c = *it_a + *it_b;
 	}
 

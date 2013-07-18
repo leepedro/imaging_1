@@ -1,5 +1,8 @@
 #include "../Imaging/image.h"
 
+#include "tests.h"
+
+#include <stdexcept>
 #include <iostream>
 
 template <typename T>
@@ -19,11 +22,11 @@ void TestImage1(void)
 	Imaging::Image<T>::Iterator it = img1.GetIterator(1, 1);
 }
 
-
 int main(void)
 {
 	try
 	{
+		TestCoordinates();
 		TestImage1<unsigned char>();
 	}
 	catch (const std::exception &ex)

@@ -13,23 +13,23 @@ namespace Imaging
 	It is identical to the number of bytes only if the image is 1 byte data type and the
 	image does not have any padding bytes. */
 	template <typename T>
-	class Dimension
+	class ImageSize : public Size3D<T>
 	{
 	public:
 		////////////////////////////////////////////////////////////////////////////////////
 		// Default constructors.
-		Dimension(void);
-		Dimension(const Dimension<T> &src);
-		Dimension<T> &operator=(const Dimension<T> &src);
+		ImageSize(void);
+		ImageSize(const ImageSize<T> &src);
+		ImageSize<T> &operator=(const ImageSize<T> &src);
 
 		////////////////////////////////////////////////////////////////////////////////////
 		// Custom constructors.
-		Dimension(T w, T h, T d);
+		ImageSize(T width, T height, T depth);
 
 		////////////////////////////////////////////////////////////////////////////////////
 		// Operators.
-		bool operator==(const Dimension<T> &src) const;
-		bool operator!=(const Dimension<T> &src) const;
+		//bool operator==(const ImageSize<T> &src) const;
+		//bool operator!=(const ImageSize<T> &src) const;
 
 		////////////////////////////////////////////////////////////////////////////////////
 		// Methods.
@@ -53,9 +53,9 @@ namespace Imaging
 
 		////////////////////////////////////////////////////////////////////////////////////
 		// Data.
-		T width;	// Number of pixels / line.
-		T height;	// Number of lines / frame.
-		T depth;	// Number of channels (elements) / pixel.
+		//T width;	// Number of pixels / line.
+		//T height;	// Number of lines / frame.
+		//T depth;	// Number of channels (elements) / pixel.
 	};
 
 
@@ -73,39 +73,35 @@ namespace Imaging
 
 		////////////////////////////////////////////////////////////////////////////////////
 		// Custom constructors.
-		Region(const Cartesian2D<T> &origin, const Cartesian2D<U> &size);
+		Region(const Point2D<T> &origin, const Size2D<U> &size);
 		Region(T x, T y, U width, U height);
-
-		////////////////////////////////////////////////////////////////////////////////////
-		// Accessors.
-		typename U &width, &height;
 
 		////////////////////////////////////////////////////////////////////////////////////
 		// Operators.
 
 		/** Moves the origin by the given distance, and returns the result as a new
 		Region<T, U> without changing this object. */
-		Region<T, U> operator+(const Cartesian2D<T> &dist) const;
+		Region<T, U> operator+(const Point2D<T> &dist) const;
 
 		/** Zooms the size by the given zoom rate without moving the origin., and returns
 		the result as a new Region<T, U> without changing this object. */
-		Region<T, U> operator*(const Cartesian2D<double> &zm) const;
+		Region<T, U> operator*(const Point2D<double> &zm) const;
 		Region<T, U> operator*(double zm) const;
 
 		////////////////////////////////////////////////////////////////////////////////////
 		// Methods.
 
 		/** Moves the origin by the given distance. */
-		void Move(const Cartesian2D<T> &dist);
+		void Move(const Point2D<T> &dist);
 
 		/** Zooms the size by the given zoom rate without moving the origin. */
-		void Zoom(const Cartesian2D<double> &zm);
+		void Zoom(const Point2D<double> &zm);
 		void Zoom(double zm);
 
 		////////////////////////////////////////////////////////////////////////////////////
 		// Data.
-		Cartesian2D<T> origin;
-		Cartesian2D<U> size;
+		Point2D<T> origin;
+		Size2D<U> size;
 	};
 
 }

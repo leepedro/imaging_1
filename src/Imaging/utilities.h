@@ -128,13 +128,17 @@ namespace Imaging
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Global functions for std::array<T, N>
 
-	/** Copies an std::array<> object to another one with different data types.
+	/** Copies an std::array<> object to another one with the same or different data types.
 
 	This function template is enabled for only between the data types that implicit
 	conversion is safely allowed.
 	1) integer -> floating && src < dst
 	2) floating -> floating && src <= dst
-	2) integer -> integer && {u -> u || s -> s} && src <= dst */
+	3) integer -> integer && {u -> u || s -> s} && src <= dst
+	4) integer -> integer && {u -> s} && src < dst
+
+	Generally [integer -> integer && {u -> s || s -> u} && src == dst] is allowed for implicit
+	conversion by compilers, but there is a risk for overflow, so it is disabled.	*/
 	/** Compiler gives a warning against int -> float, so it is disabled by enforcing
 	src < dst in case 1.
 	Since only implicitly allowed conversion is enabled, there is no need to use a safe
@@ -147,11 +151,18 @@ namespace Imaging
 		(std::is_integral<T>::value && std::is_integral<U>::value &&
 		((std::is_unsigned<T>::value && std::is_unsigned<U>::value) ||
 		(std::is_signed<T>::value && std::is_signed<U>::value)) &&
-		sizeof(T) <= sizeof(U)), void>::type
+		sizeof(T) <= sizeof(U)) ||
+		(std::is_integral<T>::value && std::is_integral<U>::value &&
+		std::is_unsigned<T>::value && std::is_signed<U>::value && sizeof(T) < sizeof(U)), void>::type
 	Copy(const std::array<T, N> &src, std::array<U, N> &dst)
 	{
 		std::copy(src.cbegin(), src.cend(), dst.begin());
 	}
+
+	/** Adds two std::array<T, N> objects of the same data type and length into another
+	std::array<T, N> object of the same data type. */
+	template <typename T, ::size_t N>
+	std::array<T, N> operator+(const std::array<T, N> &a, const std::array<T, N> &b);
 
 	/** Rounds off an std::array<T, N> from floating point data type to a given data type.
 
@@ -165,6 +176,7 @@ namespace Imaging
 
 	/** Adds two std::array<T, N> objects of the same data type and length into another
 	std::array<U, N> object of a different (or same) data type. */
+	/* TODO: This function won't work for U. */
 	template <typename T, typename U, ::size_t N>
 	void Add(const std::array<T, N> &a, const std::array<T, N> &b, std::array<U, N> &c);
 
