@@ -3,16 +3,38 @@
 
 namespace Imaging
 {
-	template <typename T, typename U>
-	typename std::enable_if<
-		std::is_arithmetic<T>::value && std::is_arithmetic<U>::value, void>::type
-		SafeAdd(const T &a, const U &b, T &c)
+	//template <typename T, typename U>
+	//typename std::enable_if<
+	//	std::is_arithmetic<T>::value && std::is_arithmetic<U>::value, void>::type
+	//	SafeAdd(const T &a, const U &b, T &c)
+	//{
+	//	if (b > 0 && a > (std::numeric_limits<T>::max() - b))
+	//		throw std::overflow_error("Result value is too high.");
+	//	else if (b < 0 && a < (std::numeric_limits<T>::min() - b))
+	//		throw std::overflow_error("Result value is too low.");
+	//	SafeCast(a + b, c);
+	//}
+
+	template <typename T>
+	typename std::enable_if<std::is_arithmetic<T>::value, void>::type
+		SafeAdd(const T &a, const T &b, T &c)
 	{
 		if (b > 0 && a > (std::numeric_limits<T>::max() - b))
 			throw std::overflow_error("Result value is too high.");
 		else if (b < 0 && a < (std::numeric_limits<T>::min() - b))
 			throw std::overflow_error("Result value is too low.");
-		SafeCast(a + b, c);
+		c = a + b;
+	}
+
+	template <typename T>
+	typename std::enable_if<std::is_arithmetic<T>::value, T>::type
+		SafeAdd(const T &a, const T &b)
+	{
+		if (b > 0 && a > (std::numeric_limits<T>::max() - b))
+			throw std::overflow_error("Result value is too high.");
+		else if (b < 0 && a < (std::numeric_limits<T>::min() - b))
+			throw std::overflow_error("Result value is too low.");
+		return a + b;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////
@@ -25,7 +47,8 @@ namespace Imaging
 		auto it_c = c.begin(), it_c_end = c.end();
 		for (auto it_a = a.cbegin(), it_b = b.cbegin();
 			it_c != it_c_end; ++it_a, ++it_b, ++it_c)
-			*it_c = *it_a + *it_b;	// This part is not protected against overflow.
+			*it_c = SafeAdd(*it_a, *it_b);
+			//*it_c = *it_a + *it_b;	// This part is not protected against overflow.
 		return c;
 	}
 

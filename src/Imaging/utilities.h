@@ -12,9 +12,11 @@ namespace Imaging
 	/** Casts source values to given destination data type while throwing an exception if
 	an integer overflow was about to happen.
 
-	The compiler warning messages for narrower conversions are silenced by static_cast<T>.
-
-	static_cast<T> is implemented even for the cases that an implicit conversion can work.
+	The compiler warning messages for narrower conversions are silenced by explicit
+	conversion, i.e., static_cast<T>.
+	Data loss is ignored by the explicit conversion.
+	Explicit conversion is implemented even for the cases that an implicit conversion can
+	work.
 	
 	@param [in] src
 	@param [out] dst
@@ -119,10 +121,56 @@ namespace Imaging
 	@exception std::overflow_error	if the result is below or beyond the range of
 	destination data type
 	*/
-	template <typename T, typename U>
-	typename std::enable_if<
-		std::is_arithmetic<T>::value && std::is_arithmetic<U>::value, void>::type
-		SafeAdd(const T &a, const U &b, T &c);
+	template <typename T>
+	typename std::enable_if<std::is_arithmetic<T>::value, void>::type
+		SafeAdd(const T &a, const T &b, T &c);
+	template <typename T>
+	typename std::enable_if<std::is_arithmetic<T>::value, T>::type
+		SafeAdd(const T &a, const T &b);
+	////////////////////////////////////////////////////////////////////////////////////////
+	/** Safe implicit conversion
+	Problem: Only the following four widening conversion cases are truly safe during data
+	type conversion.
+	The rest of converion scenarios are vulnerable for overflow or data loss, so compiler
+	throws a warning.
+	1) integer -> floating && src < dst
+	2) floating -> floating && src <= dst
+	3) integer -> integer && {u -> u || s -> s} && src <= dst
+	4) integer -> integer && {u -> s} && src < dst
+	Solution: Enable function or class for only these four cases with type traits.
+	If other snecenarios, i.e., narrowing conversion, are really necessary, use
+	static_cast<> and be aware of data loss and overflow. */
+	////////////////////////////////////////////////////////////////////////////////////////
+
+	////////////////////////////////////////////////////////////////////////////////////////
+	/** Overflow prevention from arithmetic operations
+	Data type is implicitly assumed as the widest one between the two sources.
+	If the result of an operation exceeds the data range, overflow will happen.
+	@Example
+	int i_max = std::numeric_limits<int>::max();
+	int i_1 = i_max + 1;		// overflowed
+	long long l_1 = i_max + 1;	// overflowed because i_max + 1 is assumed as int
+	long long l_temp = i_max;
+	long long l_1 = l_temp + 1;	// not overflowed
+	Solution 1:
+	1) data_type(dst) < max_data_type(src_a, src_b)
+	max_src_type temp = a + b (with checking)
+	dst = temp (with checking)
+	2) data_type(dst) == max_data_type(src_a, src_b)
+	dst = a + b (with checking)	Q. Which one between a and b is the maximum data type?
+	3) data_type(dst) > max_data_type(src_a, src_b)
+	dst = dst_type(a) + dst_type(b)
+	-> for 2) and 3),
+	if dst >= a && dst >= b,
+		dst = dst_type(a) + dst_type(b) (with checking)
+	-> for 1)
+	if ~(dst >= a && dst >= b),
+		auto temp = a + b (with checking? how?)
+		dst = static_cast<>(temp) (with checking)
+	Solution 2: (selected!)
+	Define arithmetic functions for only the same data types, and explicitly convert the
+	variables before/after the operation as necessary.	*/
+	////////////////////////////////////////////////////////////////////////////////////////
 
 
 	////////////////////////////////////////////////////////////////////////////////////////
@@ -179,7 +227,7 @@ namespace Imaging
 	// Add a safe add function ?
 
 	/** Adds two std::array<T, N> objects of the same data type and length into another
-	std::array<U, N> object of a different (or same) data type. */
+	std::array<U, N> object of a different (or the same) data type. */
 	template <typename T, typename U, typename S, ::size_t N>
 	typename std::enable_if<sizeof(T) <= sizeof(S) && sizeof(U) <= sizeof(S), void>::type
 		Add(const std::array<T, N> &a, const std::array<U, N> &b, std::array<S, N> &c);
