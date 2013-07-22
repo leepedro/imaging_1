@@ -72,6 +72,9 @@ namespace Imaging
 		const Region<typename Image<T>::SizeType, typename Image<T>::SizeType> &roiSrc,
 		Image<T> &imgDst, const Point2D<typename Image<T>::SizeType> &orgnDst);
 
+	template <typename T>
+	void Copy(const T *src, const ImageSize<typename Image<T>::SizeType> &sz,
+		Image<T> &imgDst, const Point2D<typename Image<T>::SizeType> &orgnDst);
 }
 
 #include "image_inl.h"
