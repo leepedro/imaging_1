@@ -1,4 +1,5 @@
-/** This file contains the test functions to test classes and functions defined coordinates.h */
+/** This file contains the test functions to test classes and functions defined in
+coordinates.h */
 #include "../Imaging/coordinates.h"
 
 #include <stdexcept>
@@ -54,6 +55,7 @@ void TestSize3D(void)
 
 void TestCoordinates(void)
 {
+	std::cout << std::endl << "Test for coordinates.h has started." << std::endl;
 	TestPoint2D();
 	TestPoint3D();
 	TestSize2D();

@@ -136,6 +136,7 @@
     <ClInclude Include="dimension.h" />
     <ClInclude Include="dimension_inl.h" />
     <ClInclude Include="image.h" />
+    <ClInclude Include="image_inl.h" />
     <ClInclude Include="image_processing.h" />
     <ClInclude Include="utilities.h" />
     <ClInclude Include="utilities_inl.h" />

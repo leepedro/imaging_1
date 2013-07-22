@@ -8,9 +8,10 @@
 namespace Imaging
 {
 	/** Presents a pixel-based bitmap (raster) image.
+
 	This class stores image data as a std::vector<T> object, so it does NOT need to release
 	the memory at the destructor and it does NOT support padding bytes.
-	Information about the dimension of the image is stored as a Dimension<SizeType> object.
+	Information about the dimension of the image is stored as an ImageSize object.
 	The value of image data can be changed externally by references and iterators of the
 	std::vector<T> object.
 	The dimension of image data can be changed externally by designated member functions. 
@@ -34,8 +35,8 @@ namespace Imaging
 
 		//////////////////////////////////////////////////
 		// Custom constructors.
-		Image(const ImageSize<SizeType>& d);
-		Image(SizeType w, SizeType h, SizeType d = 1);
+		Image(const ImageSize<SizeType> &sz);
+		Image(SizeType width, SizeType height, SizeType depth = 1);
 
 		//////////////////////////////////////////////////
 		// Accessors.
@@ -48,130 +49,31 @@ namespace Imaging
 		Iterator GetIterator(SizeType x, SizeType y);
 		ConstIterator GetIterator(SizeType x, SizeType y) const;
 
-		const SizeType &width, &height, &depth;
+		//const SizeType &width, &height, &depth;
 		const std::vector<T> &data;
-		const ImageSize<SizeType> &dim;
+		const ImageSize<SizeType> &size;
 
 		//////////////////////////////////////////////////
 		// Methods.
 		void clear(void);
-		void resize(const ImageSize<SizeType>& dim);
-		void resize(SizeType w, SizeType h, SizeType d = 1);
+		void resize(const ImageSize<SizeType> &sz);
+		void resize(SizeType width, SizeType height, SizeType depth = 1);
 
 	protected:
 		//////////////////////////////////////////////////
 		// Data.
 		std::vector<T> data_;
-		ImageSize<SizeType> dim_;
+		ImageSize<SizeType> size_;
 	};
 
-	//////////////////////////////////////////////////////////////////////////
-	// Default constructors.
-	/** @NOTE Check if this is the right way to initialize width, height, and depth.
-	Test it by changing dim. */
+	// Copy ROI to ROI.
 	template <typename T>
-	Image<T>::Image(void) :
-		width(dim_.width), height(dim_.height), depth(dim_.depth), data(data_), dim(dim_) {}
-
-	template <typename T>
-	Image<T>::Image(const Image<T> &src) :
-#if _MSC_VER > 1700	// from VS2013
-		Image<T>(),
-#else				// up to VS2012
-		width(dim_.width), height(dim_.height), depth(dim_.depth), data(data_), dim(dim_),
-#endif
-		data_(src.data), dim_(src.dim) {}
-
-	template <typename T>
-	Image<T> &Image<T>::operator=(const Image<T> &src)
-	{
-		this->data_ = src.data;
-		this->dim_ = src.dim;
-		return *this;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	// Custom constructors.
-	template <typename T>
-	Image<T>::Image(const ImageSize<SizeType>& d) :
-#if _MSC_VER > 1700	// from VS2013
-		Image<T>()
-#else				// up to VS2012
-		width(dim_.width), height(dim_.height), depth(dim_.depth), data(data_), dim(dim_)
-#endif
-	{
-		this->resize(d);
-	}
-
-	template <typename T>
-	Image<T>::Image(SizeType w, SizeType h, SizeType d) :
-#if _MSC_VER > 1700	// from VS2013
-		Image<T>()
-#else				// up to VS2012
-		width(dim_.width), height(dim_.height), depth(dim_.depth), data(data_), dim(dim_)
-#endif
-	{
-		this->resize(ImageSize<SizeType>(w, h, d));
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	// Accessors.
-	template <typename T>
-	T &Image<T>::operator()(SizeType x, SizeType y)
-	{
-		this->dim.CheckRange(x, y);
-		return this->data_.at(this->dim.GetOffset(x, y));
-	}
-
-	template <typename T>
-	const T &Image<T>::operator()(SizeType x, SizeType y) const
-	{
-		this->dim.CheckRange(x, y);
-		return this->data.at(this->dim.GetOffset(x, y));
-	}
-
-	template <typename T>
-	typename Image<T>::Iterator Image<T>::GetIterator(SizeType x, SizeType y)
-	{
-		this->dim.CheckRange(x, y);
-		return this->data_.begin() + this->dim.GetOffset(x, y);
-	}
-
-	template <typename T>
-	typename Image<T>::ConstIterator Image<T>::GetIterator(SizeType x, SizeType y) const
-	{
-		this->dim.CheckRange(x, y);
-		return this->data.cbegin() + this->dim.GetOffset(x, y);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	// Methods.
-	template <typename T>
-	void Image<T>::clear(void)
-	{
-		this->data_.clear();
-		this->dim_.width = 0;
-		this->dim_.height = 0;
-		this->dim_.depth = 0;
-	}
-
-	/** Resizes the std::vector<T> object only if necessary.
-	If dimension is changed while the total number of elements are the same (reshaping),
-	it does NOT run resize() function of the std::vector<T>. */
-	template <typename T>
-	void Image<T>::resize(const ImageSize<SizeType>& dim)
-	{
-		if (this->data_.size() != dim.GetNumElemPerFrame())
-			this->data_.resize(dim.GetNumElemPerFrame());
-		this->dim_ = dim;
-	}
-
-	template <typename T>
-	void Image<T>::resize(SizeType w, SizeType h, SizeType d)
-	{
-		this->resize(ImageSize<SizeType>(w, h, d));
-	}
+	void Copy(const Image<T> &imgSrc,
+		const Region<typename Image<T>::SizeType, typename Image<T>::SizeType> &roiSrc,
+		Image<T> &imgDst, const Point2D<typename Image<T>::SizeType> &orgnDst);
 
 }
+
+#include "image_inl.h"
 
 #endif

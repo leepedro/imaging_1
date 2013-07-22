@@ -3,29 +3,6 @@
 
 namespace Imaging
 {
-	//template <typename T, typename U>
-	//typename std::enable_if<
-	//	std::is_arithmetic<T>::value && std::is_arithmetic<U>::value, void>::type
-	//	SafeAdd(const T &a, const U &b, T &c)
-	//{
-	//	if (b > 0 && a > (std::numeric_limits<T>::max() - b))
-	//		throw std::overflow_error("Result value is too high.");
-	//	else if (b < 0 && a < (std::numeric_limits<T>::min() - b))
-	//		throw std::overflow_error("Result value is too low.");
-	//	SafeCast(a + b, c);
-	//}
-
-	template <typename T>
-	typename std::enable_if<std::is_arithmetic<T>::value, void>::type
-		SafeAdd(const T &a, const T &b, T &c)
-	{
-		if (b > 0 && a > (std::numeric_limits<T>::max() - b))
-			throw std::overflow_error("Result value is too high.");
-		else if (b < 0 && a < (std::numeric_limits<T>::min() - b))
-			throw std::overflow_error("Result value is too low.");
-		c = a + b;
-	}
-
 	template <typename T>
 	typename std::enable_if<std::is_arithmetic<T>::value, T>::type
 		SafeAdd(const T &a, const T &b)
@@ -38,17 +15,40 @@ namespace Imaging
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////
-	// Global functions for std::array<T, N>
+	// Global functions and operators for std::array<T, N>
+
+	/** If any operation produces integer overflow, SafeAdd() function will throw an
+	exception. */
+	template <typename T, ::size_t N>
+	void Add(const std::array<T, N> &a, const std::array<T, N> &b, std::array<T, N> &c)
+	{
+		auto it_c = c.begin(), it_c_end = c.end();
+		for (auto it_a = a.cbegin(), it_b = b.cbegin();
+			it_c != it_c_end; ++it_a, ++it_b, ++it_c)
+			*it_c = SafeAdd(*it_a, *it_b);
+	}
 
 	template <typename T, ::size_t N>
 	std::array<T, N> operator+(const std::array<T, N> &a, const std::array<T, N> &b)
 	{
 		std::array<T, N> c;
+		Add(a, b, c);
+		return c;
+	}
+
+	template <typename T, ::size_t N>
+	void Add(const std::array<T, N> &a, const T &b, std::array<T, N> &c)
+	{
 		auto it_c = c.begin(), it_c_end = c.end();
-		for (auto it_a = a.cbegin(), it_b = b.cbegin();
-			it_c != it_c_end; ++it_a, ++it_b, ++it_c)
-			*it_c = SafeAdd(*it_a, *it_b);
-			//*it_c = *it_a + *it_b;	// This part is not protected against overflow.
+		for (auto it_a = a.cbegin(); it_c != it_c_end; ++it_a, ++it_c)
+			*it_c = SafeAdd(*it_a, b);
+	}
+
+	template <typename T, ::size_t N>
+	std::array<T, N> operator+(const std::array<T, N> &a, const T &b)
+	{
+		std::array<T, N> c;
+		Add(a, b, c);
 		return c;
 	}
 
@@ -71,38 +71,52 @@ namespace Imaging
 #endif
 	}
 
-	/** This function template implicitly converts two source data into their widest one,
-	and then copy the result into destination data, so S should be the same or wider than	
-	both of T and U. */
-	template <typename T, typename U, typename S, ::size_t N>
-	typename std::enable_if<sizeof(T) <= sizeof(S) && sizeof(U) <= sizeof(S), void>::type
-		Add(const std::array<T, N> &a, const std::array<U, N> &b, std::array<S, N> &c)
+	template <typename T, ::size_t N>
+	void Multiply(const std::array<T, N> &a, double b, std::array<double, N> &c)
 	{
 		auto it_c = c.begin(), it_c_end = c.end();
-		for (auto it_a = a.cbegin(), it_b = b.cbegin();
-			it_c != it_c_end; ++it_a, ++it_b, ++it_c)
-			*it_c = *it_a + *it_b;
+		for (auto it_a = a.cbegin(); it_c != it_c_end; ++it_a, ++it_c)
+			*it_c = *it_a * b;
 	}
 
 	template <typename T, ::size_t N>
-	std::array<double, N> Multiply(const std::array<T, N> &a, double b)
+	std::array<double, N> operator*(const std::array<T, N> &a, double b)
 	{
-		std::array<double, N> dst;
-		auto it_dst = dst.begin(), it_dst_end = dst.end();
-		for (auto it_a = a.cbegin(); it_dst != it_dst_end; ++it_a, ++it_dst)
-			*it_dst_end = *it_a * b;
-		return dst;
+		std::array<double, N> c;
+		Multiply(a, b, c);
+		return c;
 	}
 
 	template <typename T, ::size_t N>
-	std::array<double, N> Multiply(const std::array<T, N> &a, const std::array<double, N> &b)
+	void Multiply(const std::array<T, N> &a, const std::array<double, N> &b,
+		std::array<double, N> &c)
 	{
-		std::array<double, N> dst;
-		auto it_dst = dst.begin(),	it_dst_end = dst.end();
-		for (auto it_a = a.cbegin(), it_b = b.cbegin();	it_dst != it_dst_end;
-			++it_a, ++it_b, ++it_dst)
-			*it_dst_end = *it_a * *it_b;
-		return dst;
+		auto it_b = b.cbegin();
+		auto it_c = c.begin(), it_c_end = c.end();
+		for (auto it_a = a.cbegin(); it_c != it_c_end; ++it_a, ++it_b, ++it_c)
+			*it_c = *it_a * *it_b;
+	}
+
+	template <typename T, ::size_t N>
+	std::array<double, N> operator*(const std::array<T, N> &a, const std::array<double, N> &b)
+	{
+		std::array<double, N> c;
+		Multiply(a, b, c);
+		return c;
+	}
+
+	template <typename T, ::size_t N>
+	void Divide(const std::array<T, N> &a, double b, std::array<double, N> &c)
+	{
+		Multiply(a, 1.0 / b, c);
+	}
+
+	template <typename T, ::size_t N>
+	std::array<double, N> operator/(const std::array<T, N> &a, double b)
+	{
+		std::array<double, N> c;
+		Divide(a, b, c);
+		return c;
 	}
 
 	template <typename T, ::size_t N>
@@ -118,7 +132,7 @@ namespace Imaging
 	std::array<double, N> Normalize(const std::array<T, N> &src, double p)
 	{
 		double norm = GetNorm(src, p);
-		return Multiply(src, 1 / norm);
+		return src / norm;
 	}
 }
 

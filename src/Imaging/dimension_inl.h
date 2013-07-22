@@ -14,14 +14,11 @@ namespace Imaging
 
 	template <typename T>
 	ImageSize<T>::ImageSize(const ImageSize<T> &src) : Size3D<T>(src) {}
-		//width(src.width), height(src.height), depth(src.depth) {}
 
 	template <typename T>
 	ImageSize<T> &ImageSize<T>::operator=(const ImageSize<T> &src)
 	{
-		this->width = src.width;
-		this->height = src.height;
-		this->depth = src.depth;
+		this->Size3D<T>::operator=(src);
 		return *this;
 	}
 
@@ -29,23 +26,7 @@ namespace Imaging
 	// Custom constructors.
 
 	template <typename T>
-	ImageSize<T>::ImageSize(T width, T height, T depth): Size3D<T>(width, height, depth) {}
-
-	////////////////////////////////////////////////////////////////////////////////////////
-	// Operators.
-
-	//template <typename T>
-	//bool ImageSize<T>::operator==(const ImageSize &src) const
-	//{
-	//	return this->width == src.width && this->height == src.height &&
-	//		this->depth == src.depth;
-	//}
-
-	//template <typename T>
-	//bool ImageSize<T>::operator!=(const ImageSize &src) const
-	//{
-	//	return !(*this == src);
-	//}
+	ImageSize<T>::ImageSize(T width, T height, T depth) : Size3D<T>(width, height, depth) {}
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Methods.
@@ -55,8 +36,12 @@ namespace Imaging
 	template <typename T>
 	void ImageSize<T>::CheckRange(T x, T y) const
 	{
-		if (x >= this->width || y >= this->height)
-			throw std::out_of_range("(x,y) is out of range.");
+		if (x < 0 || x >= this->width || y < 0 || y >= this->height)
+		{
+			std::ostringstream errMsg;
+			errMsg << "(" << x << ", " << y << ") is out of range.";
+			throw std::out_of_range(errMsg.str());
+		}
 	}
 
 	/** Enabled for only integral data types. Otherwise, the logic doesn't make sense.  */
@@ -122,10 +107,25 @@ namespace Imaging
 	// Operators.
 
 	template <typename T, typename U>
+	bool Region<T, U>::operator==(const Region<T, U> &rhs) const
+	{
+		if (this->origin == rhs.origin && this->size == rhs.size)
+			return true;
+		else
+			return false;
+	}
+
+	template <typename T, typename U>
+	bool Region<T, U>::operator!=(const Region<T, U> &rhs) const
+	{
+		return !this->operator==(rhs);
+	}
+
+	template <typename T, typename U>
 	Region<T, U> Region<T, U>::operator+(const Point2D<T> &dist) const
 	{
 		Region<T, U> dst(*this);
-		Add(this->origin, dist, dst.origin);
+		dst.Move(dist);
 		return dst;
 	}
 
@@ -133,7 +133,7 @@ namespace Imaging
 	Region<T, U> Region<T, U>::operator*(const Point2D<double> &zm) const
 	{
 		Region<T, U> dst(*this);
-		RoundAs(Multiply(this.size, zm), dst.size);
+		dst.Zoom(zm);
 		return dst;
 	}
 
@@ -141,7 +141,7 @@ namespace Imaging
 	Region<T, U> Region<T, U>::operator*(double zm) const
 	{
 		Region<T, U> dst(*this);
-		RoundAs(Multiply(this.size, zm), dst.size);
+		dst.Zoom(zm);
 		return dst;
 	}
 
@@ -154,17 +154,16 @@ namespace Imaging
 		Add(this->origin, dist, this->origin);
 	}
 
-
 	template <typename T, typename U>
 	void Region<T, U>::Zoom(const Point2D<double> &zm)
 	{
-		RoundAs(Multiply(this.size, zm), this->size);
+		RoundAs(this->size * zm, this->size);
 	}
 
 	template <typename T, typename U>
 	void Region<T, U>::Zoom(double zm)
 	{
-		RoundAs(Multiply(this.size, zm), this->size);
+		RoundAs(this->size * zm, this->size);
 	}
 }
 #endif

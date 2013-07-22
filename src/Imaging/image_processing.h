@@ -5,7 +5,6 @@
 
 namespace Imaging
 {
-	// Copy ROI to ROI.
 
 	// Copy from and to raw data (with padding).
 }

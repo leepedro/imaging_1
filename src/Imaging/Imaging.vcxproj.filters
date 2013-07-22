@@ -42,5 +42,8 @@
     <ClInclude Include="coordinates_inl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="image_inl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

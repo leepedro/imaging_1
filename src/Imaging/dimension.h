@@ -2,6 +2,7 @@
 #define DIMENSION_H
 
 #include <array>
+#include <sstream>
 
 #include "coordinates.h"
 #include "utilities.h"
@@ -9,6 +10,7 @@
 namespace Imaging
 {
 	/* Presents the dimension of an image by the number of elements.
+
 	@NOTE The number of element is NOT the same as the number of bytes.
 	It is identical to the number of bytes only if the image is 1 byte data type and the
 	image does not have any padding bytes. */
@@ -25,11 +27,6 @@ namespace Imaging
 		////////////////////////////////////////////////////////////////////////////////////
 		// Custom constructors.
 		ImageSize(T width, T height, T depth);
-
-		////////////////////////////////////////////////////////////////////////////////////
-		// Operators.
-		//bool operator==(const ImageSize<T> &src) const;
-		//bool operator!=(const ImageSize<T> &src) const;
 
 		////////////////////////////////////////////////////////////////////////////////////
 		// Methods.
@@ -51,15 +48,16 @@ namespace Imaging
 		typename std::enable_if<std::is_integral<T>::value, T>::type
 			GetOffset(T x, T y) const;
 
-		////////////////////////////////////////////////////////////////////////////////////
-		// Data.
-		//T width;	// Number of pixels / line.
-		//T height;	// Number of lines / frame.
-		//T depth;	// Number of channels (elements) / pixel.
+		/** Data (defined in parent class, Size3D<T>)
+
+		width: Number of pixels / line.
+		height: Number of lines / frame.
+		depth: Number of channels (elements) / pixel. */
 	};
 
 
 	/** Represents a region of interest or an area of interest.
+
 	The dimension is defined as the number of pixels. */
 	template <typename T, typename U>
 	class Region
@@ -78,12 +76,14 @@ namespace Imaging
 
 		////////////////////////////////////////////////////////////////////////////////////
 		// Operators.
+		bool operator==(const Region<T, U> &rhs) const;
+		bool operator!=(const Region<T, U> &rhs) const;
 
 		/** Moves the origin by the given distance, and returns the result as a new
 		Region<T, U> without changing this object. */
 		Region<T, U> operator+(const Point2D<T> &dist) const;
 
-		/** Zooms the size by the given zoom rate without moving the origin., and returns
+		/** Zooms the size by the given zoom rate without moving the origin, and returns
 		the result as a new Region<T, U> without changing this object. */
 		Region<T, U> operator*(const Point2D<double> &zm) const;
 		Region<T, U> operator*(double zm) const;
