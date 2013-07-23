@@ -111,17 +111,24 @@ namespace Imaging
 		const Region<typename Image<T>::SizeType, typename Image<T>::SizeType> &roiSrc,
 		Image<T> &imgDst, const Point2D<typename Image<T>::SizeType> &orgnDst)
 	{
+		// Check the depth of both images.
+		imgSrc.size.CheckDepth(imgDst.size.depth);
 		// Check source/destination ROI.
-		imgSrc.size.CheckRange(roiSrc.origin);
-		Point2D<typename Image<T>::SizeType> ptEnd = roiSrc.origin + roiSrc.size;
-		// NOTE: ptEnd is an excluding end of the ROI, so it could be up to (width, height).
-		if (ptEnd.x > imgSrc.size.width || ptEnd.y > imgSrc.size.height)
+		imgSrc.size.CheckRange(roiSrc.origin, roiSrc.size);
+		imgDst.size.CheckRange(orgnDst, roiSrc.size);
+
+		// Copy line by line.
+		auto it_src = imgSrc.GetIterator(roiSrc.origin.x, roiSrc.origin.y);
+		auto it_dst = imgDst.GetIterator(orgnDst.x, orgnDst.y);
+		auto nElemPerLineSrc = imgSrc.size.GetNumElemPerLine();
+		auto nElemPerLineDst = imgDst.size.GetNumElemPerLine();
+		auto nElemWidth = imgSrc.size.depth * roiSrc.size.width;
+		for (auto H = 0; H != roiSrc.size.height; ++H)
 		{
-			std::ostringstream errMsg;
-			errMsg << "(" << ptEnd.x << ", " << ptEnd.y << ") is out of range.";
-			throw std::out_of_range(errMsg.str());
+			std::copy(it_src, it_src + nElemWidth, it_dst);
+			it_src += nElemPerLineSrc;
+			it_dst += nElemPerLineDst;
 		}
-		imgDst.size.CheckRange(orgnDst);
 	}
 }
 

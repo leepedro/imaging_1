@@ -34,6 +34,12 @@ namespace Imaging
 		@exception std::out_of_range	if (x, y) is outside of the current dimension, */
 		void CheckRange(T x, T y) const;
 
+		/** Checks if the given ROI is within the range. 
+		@exception std::out_of_range	if the ROI is outside of the current dimension, */
+		void CheckRange(const Point2D<T> &orgn, const Size2D<T> &sz) const;
+
+		void CheckDepth(T depth) const;
+
 		/** Gets the number of elements for the entire frame.
 		total number of elements = depth x width x height */
 		typename std::enable_if<std::is_integral<T>::value, T>::type

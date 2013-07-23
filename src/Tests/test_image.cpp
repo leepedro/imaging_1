@@ -38,11 +38,24 @@ void TestImage1(::size_t width, ::size_t height, ::size_t depth = 1)
 	Imaging::Image<T>::Iterator it = img1.GetIterator(1, 1);
 }
 
+template <typename T>
+void TestCopy(void)
+{
+	using namespace Imaging;
+
+	Image<T> img1(60, 40, 3), img2(60, 40, 3), img3(40, 20, 3);
+	Region<Image<T>::SizeType, Image<T>::SizeType> roiSrc(10, 10, 40, 20);
+	Copy(img1, roiSrc, img2, Point2D<Image<T>::SizeType>(10, 10));
+	Copy(img1, roiSrc, img3, Point2D<Image<T>::SizeType>(0, 0));
+}
+
 void TestImage(void)
 {
 	std::cout << std::endl << "Test for image.h has started." << std::endl;
 
 	TestImage1<unsigned char>(32, 16, 3);
 	TestImage1<int>(32, 16);
+	TestCopy<unsigned char>();
+	TestCopy<int>();
 	std::cout << std::endl << "Test for image.h has been completed." << std::endl;
 }

@@ -44,6 +44,29 @@ namespace Imaging
 		}
 	}
 
+	// The end points are the excluding end of an ROI, so it could be up to (width, height).
+	template <typename T>
+	void ImageSize<T>::CheckRange(const Point2D<T> &orgn, const Size2D<T> &sz) const
+	{
+		// TODO: Figure out how to use Point2D<T>.
+		//Point2D<T> ptEnd = orgn + sz;
+		std::array<T, 2> ptEnd = orgn + sz;
+		if (orgn.x < 0 || ptEnd[0] > this->width || orgn.y < 0 || ptEnd[1] > this->height)
+		{
+			std::ostringstream errMsg;
+			errMsg << "[" << orgn.x << ", " << orgn.y << "] ~ (" << ptEnd[0] << ", " <<
+				ptEnd[1] << ") is out of range.";
+			throw std::out_of_range(errMsg.str());
+		}
+	}
+
+	template <typename T>
+	void ImageSize<T>::CheckDepth(T depth) const
+	{
+		if (this->depth != depth)
+			throw std::runtime_error("Depth is not matched.");
+	}
+
 	/** Enabled for only integral data types. Otherwise, the logic doesn't make sense.  */
 	template <typename T>
 	typename std::enable_if<std::is_integral<T>::value, T>::type

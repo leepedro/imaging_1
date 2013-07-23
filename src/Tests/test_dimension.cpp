@@ -25,7 +25,7 @@ void TestImageSize(T width, T height, T depth)
 	{
 		sz1.CheckRange(0, 0);
 		std::cout << "(0, 0) is within the range." << std::endl;
-		sz1.CheckRange(width, height);
+		sz1.CheckRange(width, height);	// detected.
 		// Following lines should NOT run.
 		std::ostringstream msg;
 		msg << "(" << width << ", " << height << ") is within the range." << std::endl;

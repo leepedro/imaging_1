@@ -18,4 +18,8 @@ int main(void)
 	{
 		std::cout << ex.what() << std::endl;
 	}
+	catch (...)
+	{
+		std::cout << "Unknown exception" << std::endl;
+	}
 }
