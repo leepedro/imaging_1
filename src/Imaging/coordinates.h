@@ -19,7 +19,17 @@ namespace Imaging
 		////////////////////////////////////////////////////////////////////////////////////
 		// Custom constructors.
 		Point2D(T x, T y);
-		//Point2D(const std::array<T, 2> &src);
+
+		/** Instantiates the object from an std::array<T, N> object.
+		
+		The purpose of this constructor is to use the operators and methods, which were
+		defined for the base class, for this class.
+
+		@Example
+		Point2D<int> ptA, ptB, ptC;
+		ptA = ptB + ptC;	// where operator+(...) is defined for only std::array<T, N>.
+		*/
+		Point2D(const std::array<T, 2> &src);
 	
 		////////////////////////////////////////////////////////////////////////////////////
 		// Accessor.

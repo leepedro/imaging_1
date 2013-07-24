@@ -51,32 +51,36 @@ namespace Imaging
 
 	//////////////////////////////////////////////////////////////////////////
 	// Accessors.
+	/* This functions are valid for only BIP format. */
 	template <typename T>
-	T &Image<T>::operator()(SizeType x, SizeType y)
+	T &Image<T>::operator()(SizeType x, SizeType y, SizeType c)
 	{
-		this->size.CheckRange(x, y);
-		return this->data_.at(this->size.GetOffset(x, y));
+		this->size.CheckRange(x, y, c);
+		return this->data_.at(this->size.GetOffset(x, y, c));
 	}
 
+	/* This functions are valid for only BIP format. */
 	template <typename T>
-	const T &Image<T>::operator()(SizeType x, SizeType y) const
+	const T &Image<T>::operator()(SizeType x, SizeType y, SizeType c) const
 	{
-		this->size.CheckRange(x, y);
-		return this->data.at(this->size.GetOffset(x, y));
+		this->size.CheckRange(x, y, c);
+		return this->data.at(this->size.GetOffset(x, y, c));
 	}
 
+	/* This functions are valid for only BIP format. */
 	template <typename T>
-	typename Image<T>::Iterator Image<T>::GetIterator(SizeType x, SizeType y)
+	typename Image<T>::Iterator Image<T>::GetIterator(SizeType x, SizeType y, SizeType c)
 	{
-		this->size.CheckRange(x, y);
-		return this->data_.begin() + this->size.GetOffset(x, y);
+		this->size.CheckRange(x, y, c);
+		return this->data_.begin() + this->size.GetOffset(x, y, c);
 	}
 
+	/* This functions are valid for only BIP format. */
 	template <typename T>
-	typename Image<T>::ConstIterator Image<T>::GetIterator(SizeType x, SizeType y) const
+	typename Image<T>::ConstIterator Image<T>::GetIterator(SizeType x, SizeType y, SizeType c) const
 	{
-		this->size.CheckRange(x, y);
-		return this->data.cbegin() + this->size.GetOffset(x, y);
+		this->size.CheckRange(x, y, c);
+		return this->data.cbegin() + this->size.GetOffset(x, y, c);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

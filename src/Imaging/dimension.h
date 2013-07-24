@@ -9,7 +9,10 @@
 
 namespace Imaging
 {
-	/* Presents the dimension of an image by the number of elements.
+	/* TODO: This class covers only BIP format, i.e., channel -> column -> row.
+	Should think about BSQ format, i.e., column -> row -> channel and BIL format, i.e.,
+	column -> channel -> row if considering remote sensing applications. */
+	/** Presents the dimension of an image by the number of elements.
 
 	@NOTE The number of element is NOT the same as the number of bytes.
 	It is identical to the number of bytes only if the image is 1 byte data type and the
@@ -26,13 +29,14 @@ namespace Imaging
 
 		////////////////////////////////////////////////////////////////////////////////////
 		// Custom constructors.
-		ImageSize(T width, T height, T depth);
+		ImageSize(T width, T height, T depth = 1);
 
 		////////////////////////////////////////////////////////////////////////////////////
 		// Methods.
-		/** Checks if the given (x, y) coordinate is within the range of (width, height).
+		/** Checks if the given (x, y, c) coordinate is within the range of
+		(width, height, depth).
 		@exception std::out_of_range	if (x, y) is outside of the current dimension, */
-		void CheckRange(T x, T y) const;
+		void CheckRange(T x, T y, T c = 0) const;
 
 		/** Checks if the given ROI is within the range. 
 		@exception std::out_of_range	if the ROI is outside of the current dimension, */
@@ -45,14 +49,16 @@ namespace Imaging
 		typename std::enable_if<std::is_integral<T>::value, T>::type
 			GetNumElemPerFrame(void) const;
 
+		/* This function makes sense for only BIP and BIL format. */
 		/** Gets the number of elements per line.
 		total number of elements / line = depth x width */
 		typename std::enable_if<std::is_integral<T>::value, T>::type
 			GetNumElemPerLine(void) const;
 
-		/** Gets the offset to the given position (x, y) as the number of elements. */
+		/* This function is valid for only BIP format. */
+		/** Gets the offset to the given position (x, y, c) as the number of elements. */
 		typename std::enable_if<std::is_integral<T>::value, T>::type
-			GetOffset(T x, T y) const;
+			GetOffset(T x, T y, T c = 0) const;
 
 		/** Data (defined in parent class, Size3D<T>)
 

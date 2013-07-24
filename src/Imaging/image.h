@@ -7,6 +7,9 @@
 
 namespace Imaging
 {
+	/* TODO: This class covers only BIP format, i.e., channel -> column -> row.
+	Should think about BSQ format, i.e., column -> row -> channel and BIL format, i.e.,
+	column -> channel -> row if considering remote sensing applications. */
 	/** Presents a pixel-based bitmap (raster) image.
 
 	This class stores image data as a std::vector<T> object, so it does NOT need to release
@@ -42,12 +45,12 @@ namespace Imaging
 		// Accessors.
 
 		/** Accesses image data for given coordinate (x, y) by a reference. */
-		T &operator()(SizeType x, SizeType y);
-		const T &operator()(SizeType x, SizeType y) const;
-
+		T &operator()(SizeType x, SizeType y, SizeType c = 0);
+		const T &operator()(SizeType x, SizeType y, SizeType c = 0) const;
+		
 		/** Accesses image data for given coordinate (x, y) by an iterator. */
-		Iterator GetIterator(SizeType x, SizeType y);
-		ConstIterator GetIterator(SizeType x, SizeType y) const;
+		Iterator GetIterator(SizeType x, SizeType y, SizeType c = 0);
+		ConstIterator GetIterator(SizeType x, SizeType y, SizeType c = 0) const;
 
 		//const SizeType &width, &height, &depth;
 		const std::vector<T> &data;

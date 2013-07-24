@@ -34,12 +34,12 @@ namespace Imaging
 	/** Throws an exception instead of returning false because you have to throw an
 	exception at high level any way. */
 	template <typename T>
-	void ImageSize<T>::CheckRange(T x, T y) const
+	void ImageSize<T>::CheckRange(T x, T y, T c) const
 	{
-		if (x < 0 || x >= this->width || y < 0 || y >= this->height)
+		if (x < 0 || x >= this->width || y < 0 || y >= this->height || c >= this->depth)
 		{
 			std::ostringstream errMsg;
-			errMsg << "(" << x << ", " << y << ") is out of range.";
+			errMsg << "(" << x << ", " << y << ", " << c << ") is out of range.";
 			throw std::out_of_range(errMsg.str());
 		}
 	}
@@ -49,13 +49,13 @@ namespace Imaging
 	void ImageSize<T>::CheckRange(const Point2D<T> &orgn, const Size2D<T> &sz) const
 	{
 		// TODO: Figure out how to use Point2D<T>.
-		//Point2D<T> ptEnd = orgn + sz;
-		std::array<T, 2> ptEnd = orgn + sz;
-		if (orgn.x < 0 || ptEnd[0] > this->width || orgn.y < 0 || ptEnd[1] > this->height)
+		Point2D<T> ptEnd = orgn + sz;
+		//std::array<T, 2> ptEnd = orgn + sz;
+		if (orgn.x < 0 || ptEnd.x > this->width || orgn.y < 0 || ptEnd.y > this->height)
 		{
 			std::ostringstream errMsg;
-			errMsg << "[" << orgn.x << ", " << orgn.y << "] ~ (" << ptEnd[0] << ", " <<
-				ptEnd[1] << ") is out of range.";
+			errMsg << "[" << orgn.x << ", " << orgn.y << "] ~ (" << ptEnd.x << ", " <<
+				ptEnd.y << ") is out of range.";
 			throw std::out_of_range(errMsg.str());
 		}
 	}
@@ -75,6 +75,7 @@ namespace Imaging
 		return this->GetNumElemPerLine() * this->height;
 	}
 
+	/* This function makes sense for only BIP or BIL format. */
 	/** Enabled for only integral data types. Otherwise, the logic doesn't make sense.  */
 	template <typename T>
 	typename std::enable_if<std::is_integral<T>::value, T>::type
@@ -83,12 +84,13 @@ namespace Imaging
 		return this->depth * this->width;
 	}
 
+	/* This function is valid for only BIP format. */
 	/** Enabled for only integral data types. Otherwise, the logic doesn't make sense.  */
 	template <typename T>
 	typename std::enable_if<std::is_integral<T>::value, T>::type
-		ImageSize<T>::GetOffset(T x, T y) const
+		ImageSize<T>::GetOffset(T x, T y, T c) const
 	{
-		return x * this->depth + y * this->width * this->depth;
+		return c + this->depth * x + this->GetNumElemPerLine() * y;
 	}
 
 

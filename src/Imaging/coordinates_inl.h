@@ -14,7 +14,7 @@ namespace Imaging
 	template <typename T>
 	Point2D<T>::Point2D(const Point2D &src) :
 #if _MSC_VER > 1700	// from VS2013	
-		std::array<T, 2>(src), Point2D<T>()
+		std::array<T, 2>(src), Point2D<T>() {}
 #else				// up to VS2012
 		std::array<T, 2>(src), x(at(0)), y(at(1)) {}
 #endif
@@ -39,6 +39,14 @@ namespace Imaging
 		this->x = x;
 		this->y = y;
 	}
+
+	template <typename T>
+	Point2D<T>::Point2D(const std::array<T, 2> &src) :
+#if _MSC_VER > 1700	// from VS2013	
+		std::array<T, 2>(src), Point2D<T>() {}
+#else				// up to VS2012
+		std::array<T, 2>(src), x(at(0)), y(at(1)) {}
+#endif
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Point3D<T>
@@ -89,7 +97,7 @@ namespace Imaging
 	template <typename T>
 	Size2D<T>::Size2D(const Size2D &src) :
 #if _MSC_VER > 1700	// from VS2013	
-		std::array<T, 2>(src), Size2D<T>()
+		std::array<T, 2>(src), Size2D<T>() {}
 #else				// up to VS2012
 		std::array<T, 2>(src), width(at(0)), height(at(1)) {}
 #endif
