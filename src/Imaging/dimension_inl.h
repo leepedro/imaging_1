@@ -48,7 +48,6 @@ namespace Imaging
 	template <typename T>
 	void ImageSize<T>::CheckRange(const Point2D<T> &orgn, const Size2D<T> &sz) const
 	{
-		// TODO: Figure out how to use Point2D<T>.
 		Point2D<T> ptEnd = orgn + sz;
 		if (orgn.x < 0 || ptEnd.x > this->width || orgn.y < 0 || ptEnd.y > this->height)
 		{

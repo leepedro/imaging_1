@@ -118,7 +118,7 @@ namespace Imaging
 		Size2D<U> size;
 	};
 
-	enum class ImageFormat {BIP, BSQ, BIL};
+	enum class ImageFormat {UNKNOWN, BIP, BSQ, BIL};
 
 	template <typename T, typename ImageFormat F>
 	class ImageSizeNew : public Size3D<T>
