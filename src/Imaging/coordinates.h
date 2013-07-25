@@ -5,6 +5,12 @@
 
 namespace Imaging
 {
+	/** The classes defined in this file are aliases of std::array<T, N>.
+	They have references indicating each element of the array such as x, y, width, height,
+	but they should not have any member variables.
+	If it does, the member variable will be discarded by the operators or methods defined
+	for std::array<T, N>. */
+
 	/** Presents a 2-D Cartesian coordinate as (x, y). */
 	template <typename T>
 	class Point2D : public std::array<T, 2>
@@ -27,8 +33,7 @@ namespace Imaging
 
 		@Example
 		Point2D<int> ptA, ptB, ptC;
-		ptA = ptB + ptC;	// where operator+(...) is defined for only std::array<T, N>.
-		*/
+		ptA = ptB + ptC;	// where operator+(...) is defined for only std::array<T, N>. */
 		Point2D(const std::array<T, 2> &src);
 	
 		////////////////////////////////////////////////////////////////////////////////////
@@ -57,7 +62,10 @@ namespace Imaging
 		T &x, &y, &z;
 	};
 
-	/** Presents the size of a 2-D Cartesian space as (width, height). */
+	/** Presents the size of a 2-D Cartesian space as (width, height).
+
+	@TODO: It makes sense to enable this class for only unsigned integer and floating point
+	data types. */
 	template <typename T>
 	class Size2D : public std::array<T, 2>
 	{
@@ -77,7 +85,10 @@ namespace Imaging
 		T &width, &height;
 	};
 
-	/** Presents the size of a 3-D Cartesian space as (width, height, depth). */
+	/** Presents the size of a 3-D Cartesian space as (width, height, depth).
+
+	@TODO: It makes sense to enable this class for only unsigned integer and floating point
+	data types. */
 	template <typename T>
 	class Size3D : public std::array<T, 3>
 	{

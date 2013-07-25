@@ -50,7 +50,6 @@ namespace Imaging
 	{
 		// TODO: Figure out how to use Point2D<T>.
 		Point2D<T> ptEnd = orgn + sz;
-		//std::array<T, 2> ptEnd = orgn + sz;
 		if (orgn.x < 0 || ptEnd.x > this->width || orgn.y < 0 || ptEnd.y > this->height)
 		{
 			std::ostringstream errMsg;

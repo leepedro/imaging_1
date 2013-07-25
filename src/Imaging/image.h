@@ -44,15 +44,14 @@ namespace Imaging
 		//////////////////////////////////////////////////
 		// Accessors.
 
-		/** Accesses image data for given coordinate (x, y) by a reference. */
+		/** Accesses image data for given coordinate (x, y, c) by a reference. */
 		T &operator()(SizeType x, SizeType y, SizeType c = 0);
 		const T &operator()(SizeType x, SizeType y, SizeType c = 0) const;
 		
-		/** Accesses image data for given coordinate (x, y) by an iterator. */
+		/** Accesses image data for given coordinate (x, y, c) by an iterator. */
 		Iterator GetIterator(SizeType x, SizeType y, SizeType c = 0);
 		ConstIterator GetIterator(SizeType x, SizeType y, SizeType c = 0) const;
 
-		//const SizeType &width, &height, &depth;
 		const std::vector<T> &data;
 		const ImageSize<SizeType> &size;
 
@@ -69,6 +68,7 @@ namespace Imaging
 		ImageSize<SizeType> size_;
 	};
 
+	// Need to be implemented depending on image format.
 	// Copy ROI to ROI.
 	template <typename T>
 	void Copy(const Image<T> &imgSrc,

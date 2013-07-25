@@ -40,6 +40,9 @@ namespace Imaging
 		this->y = y;
 	}
 
+	/** This is a risky implementation because if there is a member variable defined in this
+	class they won't be copied from the source if the source is a derived class from
+	std::array<T, N> instead of std::array<T, N>. */
 	template <typename T>
 	Point2D<T>::Point2D(const std::array<T, 2> &src) :
 #if _MSC_VER > 1700	// from VS2013	

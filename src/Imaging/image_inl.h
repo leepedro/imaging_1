@@ -51,7 +51,6 @@ namespace Imaging
 
 	//////////////////////////////////////////////////////////////////////////
 	// Accessors.
-	/* This functions are valid for only BIP format. */
 	template <typename T>
 	T &Image<T>::operator()(SizeType x, SizeType y, SizeType c)
 	{
@@ -59,7 +58,6 @@ namespace Imaging
 		return this->data_.at(this->size.GetOffset(x, y, c));
 	}
 
-	/* This functions are valid for only BIP format. */
 	template <typename T>
 	const T &Image<T>::operator()(SizeType x, SizeType y, SizeType c) const
 	{
@@ -67,7 +65,6 @@ namespace Imaging
 		return this->data.at(this->size.GetOffset(x, y, c));
 	}
 
-	/* This functions are valid for only BIP format. */
 	template <typename T>
 	typename Image<T>::Iterator Image<T>::GetIterator(SizeType x, SizeType y, SizeType c)
 	{
@@ -75,7 +72,6 @@ namespace Imaging
 		return this->data_.begin() + this->size.GetOffset(x, y, c);
 	}
 
-	/* This functions are valid for only BIP format. */
 	template <typename T>
 	typename Image<T>::ConstIterator Image<T>::GetIterator(SizeType x, SizeType y, SizeType c) const
 	{
@@ -109,7 +105,7 @@ namespace Imaging
 		this->resize(ImageSize<SizeType>(width, height, depth));
 	}
 
-
+	// This function is valid for only BIP format.
 	template <typename T>
 	void Copy(const Image<T> &imgSrc,
 		const Region<typename Image<T>::SizeType, typename Image<T>::SizeType> &roiSrc,
