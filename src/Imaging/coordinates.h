@@ -3,6 +3,8 @@
 
 #include <array>
 
+#include "utilities.h"
+
 namespace Imaging
 {
 	/** The classes defined in this file are aliases of std::array<T, N>.
@@ -106,6 +108,54 @@ namespace Imaging
 		////////////////////////////////////////////////////////////////////////////////////
 		// Accessor.
 		T &width, &height, &depth;
+	};
+
+	/** Represents a region of interest or an area of interest.
+
+	The dimension is defined as the number of pixels. */
+	template <typename T, typename U>
+	class Region
+	{
+	public:
+		////////////////////////////////////////////////////////////////////////////////////
+		// Default constructors.
+		Region(void);
+		Region(const Region<T, U> &src);
+		Region &operator=(const Region<T, U> &src);
+
+		////////////////////////////////////////////////////////////////////////////////////
+		// Custom constructors.
+		Region(const Point2D<T> &origin, const Size2D<U> &size);
+		Region(T x, T y, U width, U height);
+
+		////////////////////////////////////////////////////////////////////////////////////
+		// Operators.
+		bool operator==(const Region<T, U> &rhs) const;
+		bool operator!=(const Region<T, U> &rhs) const;
+
+		/** Moves the origin by the given distance, and returns the result as a new
+		Region<T, U> without changing this object. */
+		Region<T, U> operator+(const Point2D<T> &dist) const;
+
+		/** Zooms the size by the given zoom rate without moving the origin, and returns
+		the result as a new Region<T, U> without changing this object. */
+		Region<T, U> operator*(const Point2D<double> &zm) const;
+		Region<T, U> operator*(double zm) const;
+
+		////////////////////////////////////////////////////////////////////////////////////
+		// Methods.
+
+		/** Moves the origin by the given distance. */
+		void Move(const Point2D<T> &dist);
+
+		/** Zooms the size by the given zoom rate without moving the origin. */
+		void Zoom(const Point2D<double> &zm);
+		void Zoom(double zm);
+
+		////////////////////////////////////////////////////////////////////////////////////
+		// Data.
+		Point2D<T> origin;
+		Size2D<U> size;
 	};
 }
 

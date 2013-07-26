@@ -3,6 +3,7 @@
 
 #include <array>
 #include <algorithm>
+#include <vector>
 
 namespace Imaging
 {
@@ -282,6 +283,22 @@ namespace Imaging
 	@return The normalized vector as an std::array<double, N> object. */
 	template <typename T, ::size_t N>
 	std::array<double, N> Normalize(const std::array<T, N> &src, double p = 2.0);
+
+
+	////////////////////////////////////////////////////////////////////////////////////////
+	// Global functions and operators for std::vector<T>
+
+	/** Copies repeated lines of data from an std::vector<T> to another.
+	
+	This function is usually used to copy an ROI of data where an image is stored in an
+	std::vector<T>. */
+	template <typename T>
+	void CopyLines(typename std::vector<T>::const_iterator it_src,
+		typename std::vector<T>::size_type nElemPerLineSrc,
+		typename std::vector<T>::iterator it_dst,
+		typename std::vector<T>::size_type nElemPerLineDst,
+		typename std::vector<T>::size_type nElemWidth,
+		typename std::vector<T>::size_type nLines);
 }
 
 #include "utilities_inl.h"

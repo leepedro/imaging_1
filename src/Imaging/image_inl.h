@@ -4,6 +4,9 @@
 namespace Imaging
 {
 	//////////////////////////////////////////////////////////////////////////
+	// Image<T> class
+
+	//////////////////////////////////////////////////////////////////////////
 	// Default constructors.
 	template <typename T>
 	Image<T>::Image(void) : data(data_), size(size_) {}
@@ -15,142 +18,10 @@ namespace Imaging
 #else				// up to VS2012
 		data(data_), size(size_),
 #endif
-		data_(src.data), size_(src.size) {}
-
-	template <typename T>
-	Image<T> &Image<T>::operator=(const Image<T> &src)
-	{
-		this->data_ = src.data;
-		this->size_ = src.size;
-		return *this;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	// Custom constructors.
-	template <typename T>
-	Image<T>::Image(const ImageSize<SizeType> &sz) :
-#if _MSC_VER > 1700	// from VS2013
-		Image<T>()
-#else				// up to VS2012
-		data(data_), size(size_)
-#endif
-	{
-		this->resize(sz);
-	}
-
-	template <typename T>
-	Image<T>::Image(SizeType width, SizeType height, SizeType depth) :
-#if _MSC_VER > 1700	// from VS2013
-		Image<T>(ImageSize<SizeType>(width, height, depth)) {}
-#else				// up to VS2012
-		data(data_), size(size_)
-	{
-		this->resize(width, height, depth);
-	}
-#endif
-
-	//////////////////////////////////////////////////////////////////////////
-	// Accessors.
-	template <typename T>
-	T &Image<T>::operator()(SizeType x, SizeType y, SizeType c)
-	{
-		this->size.CheckRange(x, y, c);
-		return this->data_.at(this->size.GetOffset(x, y, c));
-	}
-
-	template <typename T>
-	const T &Image<T>::operator()(SizeType x, SizeType y, SizeType c) const
-	{
-		this->size.CheckRange(x, y, c);
-		return this->data.at(this->size.GetOffset(x, y, c));
-	}
-
-	template <typename T>
-	typename Image<T>::Iterator Image<T>::GetIterator(SizeType x, SizeType y, SizeType c)
-	{
-		this->size.CheckRange(x, y, c);
-		return this->data_.begin() + this->size.GetOffset(x, y, c);
-	}
-
-	template <typename T>
-	typename Image<T>::ConstIterator Image<T>::GetIterator(SizeType x, SizeType y, SizeType c) const
-	{
-		this->size.CheckRange(x, y, c);
-		return this->data.cbegin() + this->size.GetOffset(x, y, c);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	// Methods.
-	template <typename T>
-	void Image<T>::clear(void)
-	{
-		this->data_.clear();
-		this->size_ = ImageSize<SizeType>(0, 0, 0);
-	}
-
-	/** Resizes the std::vector<T> object only if necessary.
-	If size is changed while the total number of elements are the same (reshaping),
-	it does NOT run resize() function of the std::vector<T>. */
-	template <typename T>
-	void Image<T>::resize(const ImageSize<SizeType> &sz)
-	{
-		if (this->data.size() != sz.GetNumElemPerFrame())
-			this->data_.resize(sz.GetNumElemPerFrame());
-		this->size_ = sz;
-	}
-
-	template <typename T>
-	void Image<T>::resize(SizeType width, SizeType height, SizeType depth)
-	{
-		this->resize(ImageSize<SizeType>(width, height, depth));
-	}
-
-	// This function is valid for only BIP format.
-	template <typename T>
-	void Copy(const Image<T> &imgSrc,
-		const Region<typename Image<T>::SizeType, typename Image<T>::SizeType> &roiSrc,
-		Image<T> &imgDst, const Point2D<typename Image<T>::SizeType> &orgnDst)
-	{
-		// Check the depth of both images.
-		imgSrc.size.CheckDepth(imgDst.size.depth);
-		// Check source/destination ROI.
-		imgSrc.size.CheckRange(roiSrc.origin, roiSrc.size);
-		imgDst.size.CheckRange(orgnDst, roiSrc.size);
-
-		// Copy line by line.
-		auto it_src = imgSrc.GetIterator(roiSrc.origin.x, roiSrc.origin.y);
-		auto it_dst = imgDst.GetIterator(orgnDst.x, orgnDst.y);
-		auto nElemPerLineSrc = imgSrc.size.GetNumElemPerLine();
-		auto nElemPerLineDst = imgDst.size.GetNumElemPerLine();
-		auto nElemWidth = imgSrc.size.depth * roiSrc.size.width;
-		for (auto H = 0; H != roiSrc.size.height; ++H)
-		{
-			std::copy(it_src, it_src + nElemWidth, it_dst);
-			it_src += nElemPerLineSrc;
-			it_dst += nElemPerLineDst;
-		}
-	}
-
-
-	//////////////////////////////////////////////////////////////////////////
-	// ImageNew<T> class
-
-	//////////////////////////////////////////////////////////////////////////
-	// Default constructors.
-	template <typename T>
-	ImageNew<T>::ImageNew(void) : data(data_), size(size_) {}
-
-	template <typename T>
-	ImageNew<T>::ImageNew(const ImageNew<T> &src) :
-#if _MSC_VER > 1700	// from VS2013
-		ImageNew<T>(),
-#else				// up to VS2012
-		data(data_), size(size_),
-#endif
 		data_(src.data), size_(src.size), format(src.format) {}
 
 	template <typename T>
-	ImageNew<T> &ImageNew<T>::operator=(const ImageNew<T> &src)
+	Image<T> &Image<T>::operator=(const Image<T> &src)
 	{
 		this->data_ = src.data;
 		this->size_ = src.size;
@@ -161,9 +32,9 @@ namespace Imaging
 	//////////////////////////////////////////////////////////////////////////
 	// Custom constructors.
 	template <typename T>
-	ImageNew<T>::ImageNew(const Size3D<SizeType> &sz, ImageFormat fmt) :
+	Image<T>::Image(const Size3D<SizeType> &sz, ImageFormat fmt) :
 #if _MSC_VER > 1700	// from VS2013
-		ImageNew<T>()
+		Image<T>()
 #else				// up to VS2012
 		data(data_), size(size_)
 #endif
@@ -173,9 +44,9 @@ namespace Imaging
 	}
 
 	template <typename T>
-	ImageNew<T>::ImageNew(SizeType width, SizeType height, SizeType depth, ImageFormat fmt) :
+	Image<T>::Image(SizeType width, SizeType height, SizeType depth, ImageFormat fmt) :
 #if _MSC_VER > 1700	// from VS2013
-		ImageNew<T>(Size3D<SizeType>(width, height, depth), fmt) {}
+		Image<T>(Size3D<SizeType>(width, height, depth), fmt) {}
 #else				// up to VS2012
 		data(data_), size(size_)
 	{
@@ -190,7 +61,7 @@ namespace Imaging
 	// NOTE: Check the range for given position only if the method is declared as public.
 
 	template <typename T>
-	T &ImageNew<T>::operator()(SizeType x, SizeType y, SizeType c)
+	T &Image<T>::operator()(SizeType x, SizeType y, SizeType c)
 	{
 		this->CheckRange(c);
 		this->CheckRange(x, y);
@@ -198,7 +69,7 @@ namespace Imaging
 	}
 
 	template <typename T>
-	const T &ImageNew<T>::operator()(SizeType x, SizeType y, SizeType c) const
+	const T &Image<T>::operator()(SizeType x, SizeType y, SizeType c) const
 	{
 		this->CheckRange(c);
 		this->CheckRange(x, y);
@@ -206,7 +77,7 @@ namespace Imaging
 	}
 
 	template <typename T>
-	typename ImageNew<T>::Iterator ImageNew<T>::GetIterator(SizeType x, SizeType y, SizeType c)
+	typename Image<T>::Iterator Image<T>::GetIterator(SizeType x, SizeType y, SizeType c)
 	{
 		this->CheckRange(c);
 		this->CheckRange(x, y);
@@ -214,7 +85,7 @@ namespace Imaging
 	}
 
 	template <typename T>
-	typename ImageNew<T>::ConstIterator ImageNew<T>::GetIterator(SizeType x, SizeType y, SizeType c) const
+	typename Image<T>::ConstIterator Image<T>::GetIterator(SizeType x, SizeType y, SizeType c) const
 	{
 		this->CheckRange(c);
 		this->CheckRange(x, y);
@@ -225,16 +96,16 @@ namespace Imaging
 	// Methods.
 
 	template <typename T>
-	void ImageNew<T>::CheckDepth(const ImageNew<T> &img) const
+	void Image<T>::CheckDepth(SizeType c) const
 	{
-		if (this->size.depth != img.size.depth)
+		if (this->size.depth != c)
 			throw std::runtime_error("Depth is not matched.");
 	}
 
 	/** Throws an exception instead of returning false because you have to throw an
 	exception at a higher level any way. */
 	template <typename T>
-	void ImageNew<T>::CheckRange(SizeType c) const
+	void Image<T>::CheckRange(SizeType c) const
 	{
 		if (c >= this->size.depth)
 		{
@@ -245,7 +116,7 @@ namespace Imaging
 	}
 
 	template <typename T>
-	void ImageNew<T>::CheckRange(SizeType x, SizeType y) const
+	void Image<T>::CheckRange(SizeType x, SizeType y) const
 	{
 		if (x < 0 || x >= this->size.width || y < 0 || y >= this->size.height)
 		{
@@ -256,14 +127,14 @@ namespace Imaging
 	}
 
 	template <typename T>
-	void ImageNew<T>::CheckRange(const Point2D<SizeType> &pt) const
+	void Image<T>::CheckRange(const Point2D<SizeType> &pt) const
 	{
 		this->CheckRange(pt.x, pt.y);
 	}
 
 	// The end points are the excluding end of an ROI, so it could be up to (width, height).
 	template <typename T>
-	void ImageNew<T>::CheckRange(const Point2D<SizeType> &orgn, const Size2D<SizeType> &sz) const
+	void Image<T>::CheckRange(const Point2D<SizeType> &orgn, const Size2D<SizeType> &sz) const
 	{
 		Point2D<SizeType> ptEnd = orgn + sz;
 		if (orgn.x < 0 || ptEnd.x > this->size.width || orgn.y < 0 ||
@@ -277,20 +148,20 @@ namespace Imaging
 	}
 
 	template <typename T>
-	void ImageNew<T>::CheckRange(const Region<SizeType, SizeType> &roi) const
+	void Image<T>::CheckRange(const Region<SizeType, SizeType> &roi) const
 	{
 		this->CheckRange(roi.origin, roi.size);
 	}
 
 	template <typename T>
-	void ImageNew<T>::clear(void)
+	void Image<T>::clear(void)
 	{
 		this->data_.clear();
 		this->size_ = Size3D<SizeType>(0, 0, 0);
 	}
 
 	template <typename T>
-	typename ImageNew<T>::SizeType ImageNew<T>::GetOffset(SizeType x, SizeType y, SizeType c) const
+	typename Image<T>::SizeType Image<T>::GetOffset(SizeType x, SizeType y, SizeType c) const
 	{
 		switch (this->format)
 		{
@@ -308,17 +179,11 @@ namespace Imaging
 		}
 	}
 
-	//template <typename T>
-	//typename ImageNew<T>::SizeType ImageNew<T>::GetNumElem(void) const
-	//{
-	//	return this->size.width * this->size.height * this->size.depth;
-	//}
-
 	/** Resizes the std::vector<T> object only if necessary.
 	If size is changed while the total number of elements are the same (reshaping),
 	it does NOT run resize() function of the std::vector<T>. */
 	template <typename T>
-	void ImageNew<T>::resize(const Size3D<SizeType> &sz)
+	void Image<T>::resize(const Size3D<SizeType> &sz)
 	{
 		SizeType nElem = sz.width * sz.height * sz.depth;
 		if (this->data.size() != nElem)
@@ -327,16 +192,16 @@ namespace Imaging
 	}
 
 	template <typename T>
-	void ImageNew<T>::resize(SizeType width, SizeType height, SizeType depth)
+	void Image<T>::resize(SizeType width, SizeType height, SizeType depth)
 	{
 		this->resize(Size3D<SizeType>(width, height, depth));
 	}
 
 
 	template <typename T>
-	void Copy(const ImageNew<T> &imgSrc,
-		const Region<typename ImageNew<T>::SizeType, typename ImageNew<T>::SizeType> &roiSrc,
-		ImageNew<T> &imgDst, const Point2D<typename ImageNew<T>::SizeType> &orgnDst)
+	void Copy(const Image<T> &imgSrc,
+		const Region<typename Image<T>::SizeType, typename Image<T>::SizeType> &roiSrc,
+		Image<T> &imgDst, const Point2D<typename Image<T>::SizeType> &orgnDst)
 	{
 		// Check image format.
 		if (imgSrc.format != imgDst.format)
@@ -344,7 +209,8 @@ namespace Imaging
 			"Image format of source/destination images should be identical.");
 
 		// Check the depth of both images.
-		imgSrc.CheckDepth(imgDst);
+		imgSrc.CheckDepth(imgDst.size.depth);
+		const auto depth = imgSrc.size.depth;	// common for both src/dst.
 		// Check source/destination ROI.
 		imgSrc.CheckRange(roiSrc);
 		imgDst.CheckRange(orgnDst, roiSrc.size);
@@ -356,54 +222,69 @@ namespace Imaging
 			{
 				auto it_src = imgSrc.GetIterator(roiSrc.origin.x, roiSrc.origin.y);
 				auto it_dst = imgDst.GetIterator(orgnDst.x, orgnDst.y);
-				auto nElemPerLineSrc = imgSrc.size.depth * imgSrc.size.width;
-				auto nElemPerLineDst = imgDst.size.depth * imgDst.size.width;
-				auto nElemWidth = imgSrc.size.depth * roiSrc.size.width;
-				for (auto H = 0; H != roiSrc.size.height; ++H)
-				{
-					std::copy(it_src, it_src + nElemWidth, it_dst);
-					it_src += nElemPerLineSrc;
-					it_dst += nElemPerLineDst;
-				}
+				CopyLines<T>(it_src, depth * imgSrc.size.width, it_dst,
+					depth * imgDst.size.width, depth * roiSrc.size.width, roiSrc.size.height);
 			}
 			break;
 		case ImageFormat::BSQ:
+			for (auto C = 0; C != imgSrc.size.depth; ++C)
 			{
-				auto nElemPerLineSrc = imgSrc.size.width;
-				auto nElemPerLineDst = imgDst.size.width;
-				auto nElemWidth = roiSrc.size.width;
-				for (auto C = 0; C != imgSrc.size.depth; ++C)
-				{
-					auto it_src = imgSrc.GetIterator(roiSrc.origin.x, roiSrc.origin.y, C);
-					auto it_dst = imgDst.GetIterator(orgnDst.x, orgnDst.y, C);
-					for (auto H = 0; H != roiSrc.size.height; ++H)
-					{
-						std::copy(it_src, it_src + nElemWidth, it_dst);
-						it_src += nElemPerLineSrc;
-						it_dst += nElemPerLineDst;
-					}
-				}
+				auto it_src = imgSrc.GetIterator(roiSrc.origin.x, roiSrc.origin.y, C);
+				auto it_dst = imgDst.GetIterator(orgnDst.x, orgnDst.y, C);
+				CopyLines<T>(it_src, imgSrc.size.width, it_dst, imgDst.size.width,
+					roiSrc.size.width, roiSrc.size.height);
 			}
 			break;
 		case ImageFormat::BIL:
 			{
 				auto it_src = imgSrc.GetIterator(roiSrc.origin.x, roiSrc.origin.y);
 				auto it_dst = imgDst.GetIterator(orgnDst.x, orgnDst.y);
-				auto nElemPerChSrc = imgSrc.size.width;
-				auto nElemPerChDst = imgDst.size.width;
-				auto nElemWidth = roiSrc.size.width;
-				for (auto H = 0; H != roiSrc.size.height * imgSrc.size.depth; ++H)
-				{
-					std::copy(it_src, it_src + nElemWidth, it_dst);
-					it_src += nElemPerChSrc;
-					it_dst += nElemPerChDst;
-				}
+				CopyLines<T>(it_src, imgSrc.size.width, it_dst, imgDst.size.width,
+					roiSrc.size.width,  depth * roiSrc.size.height);
 			}
 			break;
 		default:
-			break;
+			std::ostringstream errMsg;
+			errMsg << "Image format " << static_cast<int>(imgSrc.format) <<
+				" is not supported.";
+			throw std::logic_error(errMsg.str());
 		}
 	}
+
+	template <typename T>
+	void Copy(const T *src, const Size3D<typename Image<T>::SizeType> &sz,
+		::size_t bytesPerLine, Image<T> &imgDst,
+		const Point2D<typename Image<T>::SizeType> &orgnDst, typename ImageFormat fmt)
+	{
+		// Check the depth of both images.
+		imgDst.CheckDepth(sz.depth);
+		// Check destination ROI.
+		imgDst.CheckRange(orgnDst, Size2D<typename Image<T>::SizeType>(sz.width, sz.height));
+
+		switch (fmt)
+		{
+		case Imaging::ImageFormat::BIP:
+			{
+				// TODO: Figure out how to count padded bytes.
+				//auto it_src = imgSrc.GetIterator(roiSrc.origin.x, roiSrc.origin.y);
+				auto it_dst = imgDst.GetIterator(orgnDst.x, orgnDst.y);
+				//CopyLines<T>(it_src, depth * imgSrc.size.width, it_dst,
+				//	depth * imgDst.size.width, depth * roiSrc.size.width, roiSrc.size.height);
+			}
+			break;
+		case Imaging::ImageFormat::BSQ:
+			break;
+		case Imaging::ImageFormat::BIL:
+			break;
+		default:
+			std::ostringstream errMsg;
+			errMsg << "Image format " << static_cast<int>(imgSrc.format) <<
+				" is not supported.";
+			throw std::logic_error(errMsg.str());
+		}
+		imgDst.format = fmt;
+	}
+
 }
 
 #endif

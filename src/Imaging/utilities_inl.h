@@ -134,6 +134,24 @@ namespace Imaging
 		double norm = GetNorm(src, p);
 		return src / norm;
 	}
+
+	////////////////////////////////////////////////////////////////////////////////////////
+	// Global functions and operators for std::vector<T, N>
+	template <typename T>
+	void CopyLines(typename std::vector<T>::const_iterator it_src,
+		typename std::vector<T>::size_type nElemPerLineSrc,
+		typename std::vector<T>::iterator it_dst,
+		typename std::vector<T>::size_type nElemPerLineDst,
+		typename std::vector<T>::size_type nElemWidth,
+		typename std::vector<T>::size_type nLines)
+	{
+		for (auto H = 0; H != nLines; ++H)
+		{
+			std::copy(it_src, it_src + nElemWidth, it_dst);
+			it_src += nElemPerLineSrc;
+			it_dst += nElemPerLineDst;
+		}
+	}
 }
 
 #endif

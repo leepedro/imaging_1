@@ -11,7 +11,6 @@ int main(void)
 	{
 		TestUtilities();
 		TestCoordinates();
-		TestDimension();
 		TestImage();
 	}
 	catch (const std::exception &ex)

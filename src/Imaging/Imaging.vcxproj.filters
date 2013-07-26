@@ -21,9 +21,6 @@
     <ClInclude Include="image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dimension.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="image_processing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -31,9 +28,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="coordinates.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dimension_inl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="utilities_inl.h">

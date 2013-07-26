@@ -163,5 +163,105 @@ namespace Imaging
 		this->height = height;
 		this->depth = depth;
 	}
+
+	////////////////////////////////////////////////////////////////////////////////////////
+	// Region<T, U> class
+
+	////////////////////////////////////////////////////////////////////////////////////////
+	// Default constructors.
+
+	template <typename T, typename U>
+	Region<T, U>::Region(void) {}
+
+	template <typename T, typename U>
+	Region<T, U>::Region(const Region<T, U> &src) :
+		origin(src.origin), size(src.size) {}
+
+	template <typename T, typename U>
+	Region<T, U> &Region<T, U>::operator=(const Region<T, U> &src)
+	{
+		this->origin = src.origin;
+		this->size = src.size;
+		return *this;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////
+	// Custom constructors.
+
+	template <typename T, typename U>
+	Region<T, U>::Region(const Point2D<T> &origin, const Size2D<U> &size) :
+		origin(origin), size(size) {}
+
+	// Delegation constructors are possible only from VS2013, so this won't work for now.
+	template <typename T, typename U>
+	Region<T, U>::Region(T x, T y, U width, U height) :
+#if _MSC_VER > 1700	// from VS2013
+		Region<T, U>(Point2D<T>(x, y), Size2D<U>(width, height)) {}	// for VS2013
+#else				// up to VS2012
+		origin(Point2D<T>(x, y)), size(Size2D<U>(width, height)) {}	// for VS2012
+#endif
+
+	////////////////////////////////////////////////////////////////////////////////////////
+	// Operators.
+
+	template <typename T, typename U>
+	bool Region<T, U>::operator==(const Region<T, U> &rhs) const
+	{
+		if (this->origin == rhs.origin && this->size == rhs.size)
+			return true;
+		else
+			return false;
+	}
+
+	template <typename T, typename U>
+	bool Region<T, U>::operator!=(const Region<T, U> &rhs) const
+	{
+		return !this->operator==(rhs);
+	}
+
+	template <typename T, typename U>
+	Region<T, U> Region<T, U>::operator+(const Point2D<T> &dist) const
+	{
+		Region<T, U> dst(*this);
+		dst.Move(dist);
+		return dst;
+	}
+
+	template <typename T, typename U>
+	Region<T, U> Region<T, U>::operator*(const Point2D<double> &zm) const
+	{
+		Region<T, U> dst(*this);
+		dst.Zoom(zm);
+		return dst;
+	}
+
+	template <typename T, typename U>
+	Region<T, U> Region<T, U>::operator*(double zm) const
+	{
+		Region<T, U> dst(*this);
+		dst.Zoom(zm);
+		return dst;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////
+	// Methods.
+
+	template <typename T, typename U>
+	void Region<T, U>::Move(const Point2D<T> &dist)
+	{
+		Add(this->origin, dist, this->origin);
+	}
+
+	template <typename T, typename U>
+	void Region<T, U>::Zoom(const Point2D<double> &zm)
+	{
+		RoundAs(this->size * zm, this->size);
+	}
+
+	template <typename T, typename U>
+	void Region<T, U>::Zoom(double zm)
+	{
+		RoundAs(this->size * zm, this->size);
+	}
 }
 #endif

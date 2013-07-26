@@ -53,12 +53,60 @@ void TestSize3D(void)
 		throw std::logic_error("Size3D<T>");
 }
 
+template <typename T, typename U>
+void TestRegion(T x, T y, U width, U height)
+{
+	using namespace Imaging;
+
+	Region<T, U> roi1(x, y, width, height), roi2;
+	roi2 = roi1;
+	Region<T, U> roi3 = roi1;
+
+	if (roi2 != roi1)
+		throw std::logic_error("Region<T, U>");
+	if (roi3 != roi1)
+		throw std::logic_error("Region<T, U>");
+	std::cout << "{(" << roi1.origin.x << ", " << roi1.origin.y << "), [" << roi1.size.width
+		<< ", " << roi1.size.height << "]}" << std::endl;
+
+	roi2 = roi1 + Point2D<T>(1, 1);
+	std::cout << "Before moving: {(" << roi1.origin.x << ", " << roi1.origin.y << "), [" 
+		<< roi1.size.width << ", " << roi1.size.height << "]}" << std::endl;
+	std::cout << "After moving: {(" << roi2.origin.x << ", " << roi2.origin.y << "), ["
+		<< roi2.size.width << ", " << roi2.size.height << "]}" << std::endl;
+
+	roi3 = roi1 * 2.0;
+	std::cout << "Before zooming: {(" << roi1.origin.x << ", " << roi1.origin.y << "), ["
+		<< roi1.size.width << ", " << roi1.size.height << "]}" << std::endl;
+	std::cout << "After zooming: {(" << roi3.origin.x << ", " << roi3.origin.y << "), ["
+		<< roi3.size.width << ", " << roi3.size.height << "]}" << std::endl;
+
+	roi3 = roi1 * Point2D<double>(2.0, 1.0);
+	std::cout << "Before zooming: {(" << roi1.origin.x << ", " << roi1.origin.y << "), ["
+		<< roi1.size.width << ", " << roi1.size.height << "]}" << std::endl;
+	std::cout << "After zooming: {(" << roi3.origin.x << ", " << roi3.origin.y << "), ["
+		<< roi3.size.width << ", " << roi3.size.height << "]}" << std::endl;
+}
+
 void TestCoordinates(void)
 {
 	std::cout << std::endl << "Test for coordinates.h has started." << std::endl;
-	TestPoint2D();
-	TestPoint3D();
-	TestSize2D();
-	TestSize3D();
+	try
+	{
+		TestPoint2D();
+		TestPoint3D();
+		TestSize2D();
+		TestSize3D();
+		TestRegion<int, unsigned int>(0, 0, 4, 8);
+		TestRegion<int, int>(-1, -1, 4, 8);
+	}
+	catch (const std::logic_error &ex)
+	{
+		std::cout << ex.what() << std::endl;
+	}
+	catch (...)
+	{
+		throw;
+	}
 	std::cout << "Test for coordinates.h has been completed." << std::endl;
 }
