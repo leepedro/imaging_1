@@ -6,6 +6,8 @@ image.h */
 #include <iostream>
 #include <sstream>
 
+#include "opencv2/opencv.hpp"
+
 template <typename T>
 void TestImage1(::size_t width, ::size_t height, ::size_t depth = 1)
 {
@@ -66,7 +68,40 @@ void TestCopy(void)
 	Image<T> img1(60, 40, 3), img2(60, 40, 3), img3(40, 20, 3);
 	Region<Image<T>::SizeType, Image<T>::SizeType> roiSrc(10, 10, 40, 20);
 	Copy(img1, roiSrc, img2, Point2D<Image<T>::SizeType>(10, 10));
-	Copy(img1, roiSrc, img3, Point2D<Image<T>::SizeType>(0, 0));
+	Copy(img1, roiSrc, img3, Point2D<Image<T>::SizeType>(0, 0));	
+}
+
+void TestCopyWithImage(void)
+{
+	using namespace Imaging;
+
+	cv::Mat imgSrc1 = cv::imread(std::string("Lenna.png"), CV_LOAD_IMAGE_COLOR);
+	cv::namedWindow(std::string("Source 1"), CV_WINDOW_AUTOSIZE);
+	cv::imshow(std::string("Source 1"), imgSrc1);
+	cv::waitKey(0);
+	Size3D<::size_t> sz(imgSrc1.cols, imgSrc1.rows, imgSrc1.channels());
+
+	Image<unsigned char> img1;
+	Copy(imgSrc1.ptr(), sz, img1);
+
+	int width, height, depth;
+	SafeCast(sz.height, height);
+	SafeCast(sz.width, width);
+	SafeCast(sz.depth, depth);
+	cv::Mat imgDst1(height, width, CV_8UC3, cv::Scalar(0, 0, 0));
+	Copy(img1,
+		Region<Image<unsigned char>::SizeType, Image<unsigned char>::SizeType>(0, 0, sz.width, sz.height),
+		imgDst1.ptr());
+	cv::namedWindow(std::string("Destination 1"), CV_WINDOW_AUTOSIZE);
+	cv::imshow(std::string("Destination 1"), imgDst1);
+	cv::waitKey(0);
+
+	// Recommended way!
+	auto it_src = img1.GetIterator(0, 0);
+	cv::Mat imgDst2(height, width, CV_8UC3, &(*it_src));
+	cv::namedWindow(std::string("Destination 2"), CV_WINDOW_AUTOSIZE);
+	cv::imshow(std::string("Destination 2"), imgDst2);
+	cv::waitKey(0);
 }
 
 void TestImage(void)
@@ -77,6 +112,8 @@ void TestImage(void)
 	TestImage1<int>(32, 16);
 	TestCopy<unsigned char>();
 	TestCopy<int>();
+
+	TestCopyWithImage();
 
 	std::cout << std::endl << "Test for image.h has been completed." << std::endl;
 }

@@ -64,6 +64,8 @@ namespace Imaging
 		Iterator GetIterator(SizeType x, SizeType y, SizeType c = 0);
 		ConstIterator GetIterator(SizeType x, SizeType y, SizeType c = 0) const;
 
+		// TODO: GetPointer()
+
 		const std::vector<T> &data;
 		const Size3D<SizeType> &size;
 
@@ -94,23 +96,39 @@ namespace Imaging
 		Size3D<SizeType> size_;
 	};
 
-	// Copy from an ROI to an ROI.
+	/** Copies image data of an ROI to another ROI.
+
+	@NOTE destination image must already have been allocated. */
 	template <typename T>
 	void Copy(const Image<T> &imgSrc,
 		const Region<typename Image<T>::SizeType, typename Image<T>::SizeType> &roiSrc,
 		Image<T> &imgDst, const Point2D<typename Image<T>::SizeType> &orgnDst);
 
-	/**
-	source image is padded.
-	destination image is assumed already have beed allocated.
-	the depth and ROI will not be checked against source image.
-	copy from entire (continuous) block to an ROI
-	*/
+	/** Copies an entire image from a raw data block with zero padding.
+
+	@NOTE destination image will be reallocated based on the size of source image. */
 	template <typename T>
 	void Copy(const T *src, const Size3D<typename Image<T>::SizeType> &sz,
-		::size_t bytesPerLine, Image<T> &imgDst,
-		const Point2D<typename Image<T>::SizeType> &orgnDst,
-		typename ImageFormat fmt = ImageFormat::BIP);
+		::size_t bytesPerLine, Image<T> &imgDst, ImageFormat fmt = ImageFormat::BIP);
+
+	/** Copies an entire image from a raw data block without zero padding. */
+	template <typename T>
+	void Copy(const T *src, const Size3D<typename Image<T>::SizeType> &sz,
+		Image<T> &imgDst, ImageFormat fmt = ImageFormat::BIP);
+
+	/** Copies image data of an ROI to a raw data block.
+	
+	@NOTE The range of destination data block will NOT be checked.
+	Users are responsicle to ensure the memory is already allocated at the destination. */
+	template <typename T>
+	void Copy(const Image<T> &imgSrc,
+		const Region<typename Image<T>::SizeType, typename Image<T>::SizeType> &roiSrc,
+		T *dst);
+
+	// TODO: Define this function.
+	// Copy the whole data at once instead of copying lines.
+	template <typename T>
+	void Copy(const Image<T> &imgSrc, T *dst);
 
 }
 

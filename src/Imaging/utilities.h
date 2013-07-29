@@ -113,6 +113,7 @@ namespace Imaging
 		dst = static_cast<U>(src);
 	}
 
+
 	////////////////////////////////////////////////////////////////////////////////////////
 	// safe arithmetic operations
 
@@ -299,6 +300,11 @@ namespace Imaging
 		typename std::vector<T>::size_type nElemPerLineDst,
 		typename std::vector<T>::size_type nElemWidth,
 		typename std::vector<T>::size_type nLines);
+
+	/** Copies */
+	template <typename T>
+	void CopyLines(typename std::vector<T>::const_iterator it_src, ::size_t nElemPerLineSrc,
+		T *dst, ::size_t nElemPerLineDst, ::size_t nElemWidth, ::size_t nLines);
 }
 
 #include "utilities_inl.h"

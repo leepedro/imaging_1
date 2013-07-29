@@ -152,6 +152,20 @@ namespace Imaging
 			it_dst += nElemPerLineDst;
 		}
 	}
+
+	// Implemented stdext::checked_array_iterator<> class to bypass C4996 warning.
+	template <typename T>
+	void CopyLines(typename std::vector<T>::const_iterator it_src, ::size_t nElemPerLineSrc,
+		T *dst, ::size_t nElemPerLineDst, ::size_t nElemWidth, ::size_t nLines)
+	{
+		for (auto H = 0; H != nLines; ++H)
+		{
+			std::copy(it_src, it_src + nElemWidth,
+				stdext::checked_array_iterator<T *>(dst, nElemPerLineDst));
+			it_src += nElemPerLineSrc;
+			dst += nElemPerLineDst;
+		}
+	}
 }
 
 #endif

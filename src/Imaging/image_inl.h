@@ -9,7 +9,8 @@ namespace Imaging
 	//////////////////////////////////////////////////////////////////////////
 	// Default constructors.
 	template <typename T>
-	Image<T>::Image(void) : data(data_), size(size_) {}
+	Image<T>::Image(void) : data(data_), size(size_),
+		size_(Size3D<SizeType>(0, 0, 0)), format(ImageFormat::UNKNOWN) {}
 
 	template <typename T>
 	Image<T>::Image(const Image<T> &src) :
@@ -18,7 +19,7 @@ namespace Imaging
 #else				// up to VS2012
 		data(data_), size(size_),
 #endif
-		data_(src.data), size_(src.size), format(src.format) {}
+		data_(src.data) { size_ = src.size; format = src.format; }
 
 	template <typename T>
 	Image<T> &Image<T>::operator=(const Image<T> &src)
@@ -211,6 +212,7 @@ namespace Imaging
 		// Check the depth of both images.
 		imgSrc.CheckDepth(imgDst.size.depth);
 		const auto depth = imgSrc.size.depth;	// common for both src/dst.
+
 		// Check source/destination ROI.
 		imgSrc.CheckRange(roiSrc);
 		imgDst.CheckRange(orgnDst, roiSrc.size);
@@ -253,28 +255,95 @@ namespace Imaging
 
 	template <typename T>
 	void Copy(const T *src, const Size3D<typename Image<T>::SizeType> &sz,
-		::size_t bytesPerLine, Image<T> &imgDst,
-		const Point2D<typename Image<T>::SizeType> &orgnDst, typename ImageFormat fmt)
-	{
-		// Check the depth of both images.
-		imgDst.CheckDepth(sz.depth);
-		// Check destination ROI.
-		imgDst.CheckRange(orgnDst, Size2D<typename Image<T>::SizeType>(sz.width, sz.height));
+		::size_t bytesPerLine, Image<T> &imgDst, ImageFormat fmt)
+	{		
+		if (bytesPerLine == sz.width * sizeof(T))	// no zero padding
+			Copy(src, sz, imgDst, fmt);
+		else
+		{ 	// zero padding
+			// Reset destination image for given dimension.
+			imgDst.resize(sz);
+			imgDst.format = fmt;
 
-		switch (fmt)
-		{
-		case Imaging::ImageFormat::BIP:
+			::size_t nElemWidthSrc = bytesPerLine / sizeof(T);
+			switch (fmt)
 			{
-				// TODO: Figure out how to count padded bytes.
-				//auto it_src = imgSrc.GetIterator(roiSrc.origin.x, roiSrc.origin.y);
-				auto it_dst = imgDst.GetIterator(orgnDst.x, orgnDst.y);
-				//CopyLines<T>(it_src, depth * imgSrc.size.width, it_dst,
-				//	depth * imgDst.size.width, depth * roiSrc.size.width, roiSrc.size.height);
+			case Imaging::ImageFormat::BIP:
+				{
+					auto it_dst = imgDst.GetIterator(0, 0);
+					CopyLines<T>(src, nElemWidthSrc, it_dst,
+						depth * imgDst.size.width, depth * sz.width, sz.height);
+				}
+				break;
+			case Imaging::ImageFormat::BSQ:
+				for (auto C = 0; C != sz.depth; ++C)
+				{
+					auto it_dst = imgDst.GetIterator(0, 0, C);
+					CopyLines<T>(src + nElemWidthSrc * sz.height * C, nElemWidthSrc, it_dst,
+						imgDst.size.width, sz.width, sz.height);
+				}
+				break;
+			case Imaging::ImageFormat::BIL:
+				{
+					auto it_dst = imgDst.GetIterator(0, 0);
+					CopyLines<T>(src, nElemWidthSrc, it_dst, imgDst.size.width,
+						sz.width, depth * sz.height);
+				}
+				break;
+			default:
+				std::ostringstream errMsg;
+				errMsg << "Image format " << static_cast<int>(imgSrc.format) <<
+					" is not supported.";
+				throw std::logic_error(errMsg.str());
+			}
+		}
+	}
+
+	template <typename T>
+	void Copy(const T *src, const Size3D<typename Image<T>::SizeType> &sz,
+		Image<T> &imgDst, ImageFormat fmt)
+	{
+		// Reset destination image for given dimension.
+		imgDst.resize(sz);
+		imgDst.format = fmt;
+		
+		auto it_dst = imgDst.GetIterator(0, 0);
+		std::copy(src, src + sz.depth * sz.width * sz.height, it_dst);
+	}
+
+	template <typename T>
+	void Copy(const Image<T> &imgSrc,
+		const Region<typename Image<T>::SizeType, typename Image<T>::SizeType> &roiSrc,
+		T *dst)
+	{
+		// Check source/destination ROI.
+		imgSrc.CheckRange(roiSrc);
+
+		// Copy line by line.
+		switch (imgSrc.format)
+		{
+		case ImageFormat::BIP:
+			{
+				auto it_src = imgSrc.GetIterator(roiSrc.origin.x, roiSrc.origin.y);
+				CopyLines<T>(it_src, imgSrc.size.depth * imgSrc.size.width, dst,
+					imgSrc.size.depth * roiSrc.size.width,
+					imgSrc.size.depth * roiSrc.size.width, roiSrc.size.height);
 			}
 			break;
-		case Imaging::ImageFormat::BSQ:
+		case ImageFormat::BSQ:
+			for (auto C = 0; C != imgSrc.size.depth; ++C)
+			{
+				auto it_src = imgSrc.GetIterator(roiSrc.origin.x, roiSrc.origin.y, C);
+				CopyLines<T>(it_src, imgSrc.size.width, dst + roiSrc.size.width * roiSrc.size.height * C,
+					roiSrc.size.width, roiSrc.size.width, roiSrc.size.height);
+			}
 			break;
-		case Imaging::ImageFormat::BIL:
+		case ImageFormat::BIL:
+			{
+				auto it_src = imgSrc.GetIterator(roiSrc.origin.x, roiSrc.origin.y);
+				CopyLines<T>(it_src, imgSrc.size.width, dst, roiSrc.size.width,
+					roiSrc.size.width,  imgSrc.size.depth * roiSrc.size.height);
+			}
 			break;
 		default:
 			std::ostringstream errMsg;
@@ -282,9 +351,8 @@ namespace Imaging
 				" is not supported.";
 			throw std::logic_error(errMsg.str());
 		}
-		imgDst.format = fmt;
-	}
 
+	}
 }
 
 #endif

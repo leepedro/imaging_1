@@ -6,6 +6,6 @@
 namespace Imaging
 {
 
-	// Copy from and to raw data (with padding).
+	// resize images
 }
 #endif
