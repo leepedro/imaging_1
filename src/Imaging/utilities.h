@@ -113,6 +113,52 @@ namespace Imaging
 		dst = static_cast<U>(src);
 	}
 
+	/** TODO: Implement a not-akward looking safe cast.
+
+	The SafeCast defined above looks weired.
+	@Example
+	int a;
+	unsigned int b;
+	SafeCast(a, b);
+	
+	Instead design something like saturate_cast<> in OpenCV.
+	@Example
+	int a;
+	unsigned int b = SafeCast<unsigned int>(a);
+
+	This approach requires to implement separate function overload for each source data type.
+	Will require longer implmentation but interface might be simpler.
+
+	Source data types: all arithmetic POD data types -> 14 !!!
+	unsigned char, char, signed char, unsigned short, (signed) short, unsigned int,
+	(signed) int, unsigned long(?), (signed) long(?), unsigned long long,
+	(signed) long long, float, double, long double
+	Skip: bool, char16_t, char32_t, wchar_t
+	*/
+	template <typename T>
+	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(unsigned char);
+	template <typename T>
+	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(char);
+	template <typename T>
+	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(signed char);
+	template <typename T>
+	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(unsigned short);
+	template <typename T>
+	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(signed short);
+	template <typename T>
+	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(unsigned int);
+	template <typename T>
+	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(signed int);
+	template <typename T>
+	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(unsigned long long);
+	template <typename T>
+	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(signed long long);
+	template <typename T>
+	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(float);
+	template <typename T>
+	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(double);
+	template <typename T>
+	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(long double);
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// safe arithmetic operations
