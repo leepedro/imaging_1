@@ -96,6 +96,11 @@ namespace Imaging
 		Size3D<SizeType> size_;
 	};
 
+#if _MSC_VER > 1700	// from VS2013
+	template <typename T>
+	using ROI = Region<typename Image<T>::SizeType, typename Image<T>::SizeType>;
+#endif
+
 	/** Copies image data of an ROI to another ROI.
 
 	@NOTE destination image must already have been allocated. */
