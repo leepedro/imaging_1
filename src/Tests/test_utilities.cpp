@@ -31,33 +31,36 @@ void TestsSafeCast(void)
 
 	int i_max(std::numeric_limits<int>::max()), i_neg(-1), i_small(1), i_dst;
 	unsigned int ui_max(std::numeric_limits<unsigned int>::max()), ui_small(1), ui_dst;
-	long long ll_max(std::numeric_limits<long long>::max()), ll_neg(-1), ll_small(1);
+	long long ll_max(std::numeric_limits<long long>::max()), ll_neg(-1), ll_small(1),
+		ll_min(std::numeric_limits<long long>::min());
 	unsigned long long ull_dst;
-	float f_small(1.0), f_max(std::numeric_limits<float>::max()), f_dst;
-	double d_neg(-1.0), d_small(1.0), d_dst;
+	//float f_small(1.0), f_max(std::numeric_limits<float>::max()), f_dst;
+	//double d_neg(-1.0), d_small(1.0), d_dst;
 
 	// negative integer overflow risk.
 	std::cout << std::endl;
 	std::cout << "negative integer overflow risk" << std::endl;
 	//TestSafeCast(d_neg, ui_dst);		// Warning C4244, overflow detected.
 	//TestSafeCast(d_small, ui_dst);		// Warning C4244
-	TestSafeCast(i_neg, ui_dst);		// overflow detected.
 	TestSafeCast(i_small, ui_dst);
+	TestSafeCast(i_neg, ui_dst);		// overflow detected.
+	TestSafeCast(ll_neg, i_dst);
+	TestSafeCast(ll_min, i_dst);		// overflow detected.
 
 	// positive integer overflow risk.
 	std::cout << std::endl;
 	std::cout << "positive integer overflow risk" << std::endl;
-	TestSafeCast(ll_max, i_dst);		// overflow detected.
 	TestSafeCast(ll_small, i_dst);
-	TestSafeCast(ui_max, i_dst);		// overflow detected.
+	TestSafeCast(ll_max, i_dst);		// overflow detected.
 	TestSafeCast(ui_small, i_dst);
+	TestSafeCast(ui_max, i_dst);		// overflow detected.
 
 	// both negative and positive
 	std::cout << std::endl;
 	std::cout << "both negative and positive integer overflow risk" << std::endl;
+	TestSafeCast(ll_small, ui_dst);
 	TestSafeCast(ll_max, ui_dst);		// overflow detected.
 	TestSafeCast(ll_neg, ui_dst);		// overflow detected.
-	TestSafeCast(ll_small, ui_dst);
 
 	// no risk
 	std::cout << std::endl;

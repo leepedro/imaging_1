@@ -5,7 +5,7 @@ namespace Imaging
 {
 	template <typename T>
 	typename std::enable_if<std::is_arithmetic<T>::value, T>::type
-		SafeAdd(const T &a, const T &b)
+		SafeAdd(T a, T b)
 	{
 		if (b > 0 && a > (std::numeric_limits<T>::max() - b))
 			throw std::overflow_error("Result value is too high.");
@@ -62,12 +62,15 @@ namespace Imaging
 		auto it_dst = dst.begin(), it_dst_end = dst.end();
 		for (auto it_src = src.cbegin(); it_dst != it_dst_end; ++it_src, ++it_dst)
 #if _MSC_VER > 1700	// from C+11
-			SafeCast(std::round(*it_src), *it_dst);
+			*it_dst = static_cast<U>(std::round(*it_src));
+			//SafeCast(std::round(*it_src), *it_dst);
 #else				// up to VS2012
 			if (*it_src >= 0)
-				SafeCast(std::floor(*it_src + 0.5), *it_dst);
+				*it_dst = static_cast<U>(std::floor(*it_src + 0.5));
+				//SafeCast(std::floor(*it_src + 0.5), *it_dst);
 			else
-				SafeCast(std::ceil(*it_src - 0.5), *it_dst);
+				*it_dst = static_cast<U>(std::ceil(*it_src - 0.5));
+				//SafeCast(std::ceil(*it_src - 0.5), *it_dst);
 #endif
 	}
 

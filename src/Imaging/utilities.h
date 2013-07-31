@@ -116,11 +116,11 @@ namespace Imaging
 		dst = static_cast<U>(src);
 	}
 
-	/** Casts source values to given destination data type while throwing an exception if
-	an integer overflow happens.
+	/** Casts an integer value to given another integer data type while throwing an
+	exception if an integer overflow happens.
 
 	Supports only integral type for both source and destination.
-	The compiler warning messages for narrower conversions are silenced by explicit
+	The compiler warning messages for narrowing conversions are silenced by explicit
 	conversion, i.e., static_cast<T>.
 	Implicit conversion is used if it is sufficient.
 	
@@ -140,7 +140,7 @@ namespace Imaging
 
 	B) Positive integer overflow risk
 	Problem:
-	An extremely high value can be rolled over if
+	An extremely high value can be rolled over as a negative value if
 	 1) any narrowing conversion
 	 2) unsigned -> signed with same data width conversion
 	Solution:
@@ -224,6 +224,12 @@ namespace Imaging
 		return src;
 	}
 
+	////////////////////////////////////////////////////////////////////////////////////////
+	// safe round operations (floating point to integer)
+
+	/**
+	floating -> integer, src <= dst
+	*/
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// safe arithmetic operations
@@ -269,7 +275,7 @@ namespace Imaging
 	destination data type */
 	template <typename T>
 	typename std::enable_if<std::is_arithmetic<T>::value, T>::type
-		SafeAdd(const T &a, const T &b);
+		SafeAdd(T a, T b);
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	/** Safe implicit conversion
@@ -282,8 +288,8 @@ namespace Imaging
 	2) floating -> floating && src <= dst
 	3) integer -> integer && {u -> u || s -> s} && src <= dst
 	4) integer -> integer && {u -> s} && src < dst
-	Generally [integer -> integer && {u -> s || s -> u} && src == dst] is allowed for implicit
-	conversion by compilers, but there is a risk for overflow.
+	Generally [integer -> integer && {u -> s || s -> u} && src == dst] is allowed for
+	implicit conversion by compilers, but there is a risk for overflow.
 
 	Solution: Enable function or class for only these four cases with type traits.
 	If other snecenarios, i.e., narrowing conversion, are really necessary, use
