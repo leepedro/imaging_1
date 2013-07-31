@@ -56,6 +56,9 @@ namespace Imaging
 	check routines for given conditions. The conditions of type trait classes are computed
 	during compile-time instead of run-time. We may achieve the similar result with function 
 	template specialization, but we have to explicitly define them for each data type.
+
+	NO!!! This method is flawed because minimum float value is lower than minimum integer
+	value, and maximum float value is higher than maximum integer value.
 	*/
 
 	// 1) Negative risk only. (A & ~B)
@@ -113,52 +116,114 @@ namespace Imaging
 		dst = static_cast<U>(src);
 	}
 
-	/** TODO: Implement a not-akward looking safe cast.
+	/** Casts source values to given destination data type while throwing an exception if
+	an integer overflow happens.
 
-	The SafeCast defined above looks weired.
-	@Example
-	int a;
-	unsigned int b;
-	SafeCast(a, b);
+	Supports only integral type for both source and destination.
+	The compiler warning messages for narrower conversions are silenced by explicit
+	conversion, i.e., static_cast<T>.
+	Implicit conversion is used if it is sufficient.
 	
-	Instead design something like saturate_cast<> in OpenCV.
+	@exception std::overflow_error	if source value is beyond the range of destination data
+	type
+
+	Two kinds of integer overflow risks are possible.
+
+	A) Negative integer overflow risk
+	Problem:
+	A negative value can be misunderstood as a positive value by misinterpreting the sign 
+	bit if
+	 1) signed -> unsigned with any conversion
+	 2) signed -> signed with narrowing conversion
+	Solution:
+	Check if source value is smaller than the minimum limit of destination type.
+
+	B) Positive integer overflow risk
+	Problem:
+	An extremely high value can be rolled over if
+	 1) any narrowing conversion
+	 2) unsigned -> signed with same data width conversion
+	Solution:
+	Check if the source value is larger than maximum limit of destination type.
+
+	These two kinds of risks create four possible scenarios.
+	1) Negative risk only. (A & ~B)
+	2) Positive risk only. (~A & B)
+	3) Both negative and positive risks. (A & B)
+	4) No risk. (~A & ~B)
+	If source and destination data types are identical, it belongs to the no risk case by
+	the logic.
+
 	@Example
 	int a;
 	unsigned int b = SafeCast<unsigned int>(a);
 
-	This approach requires to implement separate function overload for each source data type.
-	Will require longer implmentation but interface might be simpler.
+	These four scenarios are exclusively defined by enabling return values using type trait 
+	classes. This approach minimizes run-time overhead by implementing only the required 
+	check routines for given conditions. The conditions of type trait classes are computed
+	during compile-time instead of run-time. We may achieve the similar result with function 
+	template specialization, but we have to explicitly define them for each data type. */
+		
+	// 1. Negative risk only. (A & ~B)
+	template <typename T, typename U>
+	typename std::enable_if<(std::is_integral<T>::value && std::is_integral<U>::value) &&
+		(((std::is_signed<U>::value && std::is_unsigned<T>::value) ||
+		(std::is_signed<U>::value && std::is_signed<T>::value && sizeof(U) > sizeof(T))) &&
+		!((sizeof(U) > sizeof(T)) ||
+		(std::is_unsigned<U>::value && std::is_signed<T>::value && sizeof(U) == sizeof(T)))),
+		T>::type SafeCast_(U src)
+	{
+		if (src < static_cast<U>(std::numeric_limits<T>::min()))
+			throw std::overflow_error("Source value is too low.");
+		else
+			return static_cast<T>(src);
+	}
 
-	Source data types: all arithmetic POD data types -> 14 !!!
-	unsigned char, char, signed char, unsigned short, (signed) short, unsigned int,
-	(signed) int, unsigned long(?), (signed) long(?), unsigned long long,
-	(signed) long long, float, double, long double
-	Skip: bool, char16_t, char32_t, wchar_t
-	*/
-	template <typename T>
-	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(unsigned char);
-	template <typename T>
-	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(char);
-	template <typename T>
-	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(signed char);
-	template <typename T>
-	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(unsigned short);
-	template <typename T>
-	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(signed short);
-	template <typename T>
-	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(unsigned int);
-	template <typename T>
-	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(signed int);
-	template <typename T>
-	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(unsigned long long);
-	template <typename T>
-	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(signed long long);
-	template <typename T>
-	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(float);
-	template <typename T>
-	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(double);
-	template <typename T>
-	typename std::enable_if<std::is_arithmetic<T>::value, T>::type SafeCast(long double);
+	// 2. Positive risk only. (~A & B)
+	template <typename T, typename U>
+	typename std::enable_if<(std::is_integral<T>::value && std::is_integral<U>::value) &&
+		(!((std::is_signed<U>::value && std::is_unsigned<T>::value) ||
+		(std::is_signed<U>::value && std::is_signed<T>::value && sizeof(U) > sizeof(T))) &&
+		((sizeof(U) > sizeof(T)) ||
+		(std::is_unsigned<U>::value && std::is_signed<T>::value && sizeof(U) == sizeof(T)))),
+		T>::type SafeCast_(U src)
+	{
+		if (src > static_cast<U>(std::numeric_limits<T>::max()))
+			throw std::overflow_error("Source value is too high.");
+		else
+			return static_cast<T>(src);
+	}
+
+	// 3. Both negative and positive risks. (A & B)
+	template <typename T, typename U>
+	typename std::enable_if<(std::is_integral<T>::value && std::is_integral<U>::value) &&
+		(((std::is_signed<U>::value && std::is_unsigned<T>::value) ||
+		(std::is_signed<U>::value && std::is_signed<T>::value && sizeof(U) > sizeof(T))) &&
+		((sizeof(U) > sizeof(T)) ||
+		(std::is_unsigned<U>::value && std::is_signed<T>::value && sizeof(U) == sizeof(T)))),
+		T>::type SafeCast_(U src)
+	{
+		if (src < static_cast<U>(std::numeric_limits<T>::min()))
+			throw std::overflow_error("Source value is too low.");
+		else if (src > static_cast<U>(std::numeric_limits<T>::max()))
+			throw std::overflow_error("Source value is too high.");
+		else
+			return static_cast<T>(src);
+	}
+
+	// 4. No risk. (~A & ~B)
+	// Since there is no risk of integer overflow, implicit conversion is sufficient.
+	template <typename T, typename U>
+	typename std::enable_if<(std::is_integral<T>::value && std::is_integral<U>::value) &&
+		(!((std::is_signed<U>::value && std::is_unsigned<T>::value) ||
+		(std::is_signed<U>::value && std::is_signed<T>::value && sizeof(U) > sizeof(T))) &&
+		!((sizeof(U) > sizeof(T)) ||
+		(std::is_unsigned<U>::value && std::is_signed<T>::value && sizeof(U) == sizeof(T)))),
+		T>::type SafeCast_(U src)
+	{
+		return src;
+	}
+
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// safe arithmetic operations

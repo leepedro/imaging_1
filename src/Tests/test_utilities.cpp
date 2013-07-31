@@ -9,7 +9,8 @@ void TestSafeCast(const T src, U &dst)
 {	
 	try
 	{
-		Imaging::SafeCast(src, dst);
+		//Imaging::SafeCast(src, dst);
+		dst = Imaging::SafeCast_<U>(src);
 		std::cout << "Casted " << typeid(T).name() << " " << src << " to " <<
 		typeid(U).name() << " " << dst << std::endl;
 	}
@@ -32,14 +33,14 @@ void TestsSafeCast(void)
 	unsigned int ui_max(std::numeric_limits<unsigned int>::max()), ui_small(1), ui_dst;
 	long long ll_max(std::numeric_limits<long long>::max()), ll_neg(-1), ll_small(1);
 	unsigned long long ull_dst;
-	float f_small(1.0), f_dst;
+	float f_small(1.0), f_max(std::numeric_limits<float>::max()), f_dst;
 	double d_neg(-1.0), d_small(1.0), d_dst;
 
 	// negative integer overflow risk.
 	std::cout << std::endl;
 	std::cout << "negative integer overflow risk" << std::endl;
-	TestSafeCast(d_neg, ui_dst);		// Warning C4244, overflow detected.
-	TestSafeCast(d_small, ui_dst);		// Warning C4244
+	//TestSafeCast(d_neg, ui_dst);		// Warning C4244, overflow detected.
+	//TestSafeCast(d_small, ui_dst);		// Warning C4244
 	TestSafeCast(i_neg, ui_dst);		// overflow detected.
 	TestSafeCast(i_small, ui_dst);
 
@@ -62,8 +63,8 @@ void TestsSafeCast(void)
 	std::cout << std::endl;
 	std::cout << "no risk" << std::endl;
 	TestSafeCast(ui_max, ull_dst);
-	TestSafeCast(f_small, d_dst);
-	TestSafeCast(d_small, f_dst);
+	//TestSafeCast(f_small, d_dst);
+	//TestSafeCast(d_small, f_dst);
 
 	std::cout << "Test for safe casting completed." << std::endl;
 }
