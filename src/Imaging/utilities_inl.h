@@ -52,26 +52,13 @@ namespace Imaging
 		return c;
 	}
 
-	/** <cmath> of C+11 supports std::round(), but VS2012 does not support it yet.
-	The 'round-off from zero' algorithm, which is equivalent to the C+11 round(), is
-	implemented using std::floor() and std::ceil(). */
 	template <typename T, typename U, ::size_t N>
 	typename std::enable_if<std::is_floating_point<T>::value, void>::type
 		RoundAs(const std::array<T, N> &src, std::array<U, N> &dst)
 	{
 		auto it_dst = dst.begin(), it_dst_end = dst.end();
 		for (auto it_src = src.cbegin(); it_dst != it_dst_end; ++it_src, ++it_dst)
-#if _MSC_VER > 1700	// from C+11
-			*it_dst = static_cast<U>(std::round(*it_src));
-			//SafeCast(std::round(*it_src), *it_dst);
-#else				// up to VS2012
-			if (*it_src >= 0)
-				*it_dst = static_cast<U>(std::floor(*it_src + 0.5));
-				//SafeCast(std::floor(*it_src + 0.5), *it_dst);
-			else
-				*it_dst = static_cast<U>(std::ceil(*it_src - 0.5));
-				//SafeCast(std::ceil(*it_src - 0.5), *it_dst);
-#endif
+			*it_dst = RoundAs<U>(*it_src);
 	}
 
 	template <typename T, ::size_t N>
