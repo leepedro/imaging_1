@@ -351,7 +351,14 @@ namespace Imaging
 				" is not supported.";
 			throw std::logic_error(errMsg.str());
 		}
+	}
 
+	template <typename T>
+	void Copy(const Image<T> &imgSrc, T *dst)
+	{
+		auto it_src = imgSrc.GetIterator(0, 0);
+		auto nElem = imgSrc.size.width * imgSrc.size.height * imgSrc.size.depth;
+		std::copy(it_src, it_src + nElem, dst);
 	}
 }
 

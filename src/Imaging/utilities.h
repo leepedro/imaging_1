@@ -224,7 +224,9 @@ namespace Imaging
 	//	return src;
 	//}
 
-	// floating to integer
+	/** conversion from floating point to integer with integer overflow check
+	
+	Ignore data precision loss. */
 	template <typename T, typename U>
 	typename std::enable_if<std::is_floating_point<U>::value && std::is_integral<T>::value,
 		T>::type SafeCast_(U src)
@@ -237,7 +239,8 @@ namespace Imaging
 			return static_cast<T>(src);
 	}
 
-	/** floating to floating with narrowing conversion
+	/** narrowing conversion from floating point to floating point with integer (?) overflow
+	check
 
 	std::numeric_limits<T>::min() for floating point data types return the minimum precision
 	value instead of the negative minimum value. */

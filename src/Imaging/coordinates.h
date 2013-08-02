@@ -81,6 +81,7 @@ namespace Imaging
 		////////////////////////////////////////////////////////////////////////////////////
 		// Custom constructors.
 		Size2D(T width, T height);
+		//Size2D(const std::array<T, 2> &src);
 
 		////////////////////////////////////////////////////////////////////////////////////
 		// Accessor.
@@ -104,6 +105,7 @@ namespace Imaging
 		////////////////////////////////////////////////////////////////////////////////////
 		// Custom constructors.
 		Size3D(T width, T height, T depth);
+		//Size3D(const std::array<T, 3> &src);
 
 		////////////////////////////////////////////////////////////////////////////////////
 		// Accessor.
@@ -112,7 +114,7 @@ namespace Imaging
 
 	/** Represents a region of interest or an area of interest.
 
-	The dimension is defined as the number of pixels. */
+	The dimension is defined as the number of pixels as [x, y] ~ (x + width, y + height). */
 	template <typename T, typename U>
 	class Region
 	{

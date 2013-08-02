@@ -116,7 +116,9 @@ namespace Imaging
 	void Copy(const T *src, const Size3D<typename Image<T>::SizeType> &sz,
 		::size_t bytesPerLine, Image<T> &imgDst, ImageFormat fmt = ImageFormat::BIP);
 
-	/** Copies an entire image from a raw data block without zero padding. */
+	/** Copies an entire image from a raw data block without zero padding.
+	
+	@NOTE destination image will be reallocated based on the size of source image. */
 	template <typename T>
 	void Copy(const T *src, const Size3D<typename Image<T>::SizeType> &sz,
 		Image<T> &imgDst, ImageFormat fmt = ImageFormat::BIP);
@@ -124,13 +126,12 @@ namespace Imaging
 	/** Copies image data of an ROI to a raw data block.
 	
 	@NOTE The range of destination data block will NOT be checked.
-	Users are responsicle to ensure the memory is already allocated at the destination. */
+	Users are responsible to ensure the memory is already allocated at the destination. */
 	template <typename T>
 	void Copy(const Image<T> &imgSrc,
 		const Region<typename Image<T>::SizeType, typename Image<T>::SizeType> &roiSrc,
 		T *dst);
 
-	// TODO: Define this function.
 	// Copy the whole data at once instead of copying lines.
 	template <typename T>
 	void Copy(const Image<T> &imgSrc, T *dst);
