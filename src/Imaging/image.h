@@ -64,7 +64,9 @@ namespace Imaging
 		Iterator GetIterator(SizeType x, SizeType y, SizeType c = 0);
 		ConstIterator GetIterator(SizeType x, SizeType y, SizeType c = 0) const;
 
-		// TODO: GetPointer()
+		/** Accesses image data for given coordinate (x, y, c) by a pointer. */
+		T *GetPointer(SizeType x, SizeType y, SizeType c = 0);
+		const T *GetPointer(SizeType x, SizeType y, SizeType c = 0) const;
 
 		const std::vector<T> &data;
 		const Size3D<SizeType> &size;
@@ -78,6 +80,7 @@ namespace Imaging
 		void CheckRange(const Point2D<SizeType> &orgn, const Size2D<SizeType> &sz) const;
 		void CheckRange(const Region<SizeType, SizeType> &roi) const;
 		void clear(void);
+		Region<typename Image<T>::SizeType, typename Image<T>::SizeType> GetRoi(void) const;
 		void resize(const Size3D<SizeType> &sz);
 		void resize(SizeType width, SizeType height, SizeType depth = 1);
 
@@ -96,6 +99,68 @@ namespace Imaging
 		Size3D<SizeType> size_;
 	};
 
+	enum class ImageDataType {UINT8, INT8, UINT16, INT16, UINT32, INT32, UINT64, INT64,
+		FLOAT32, FLOAT64};
+
+	class ImageRaw
+	{
+	public:
+		//////////////////////////////////////////////////
+		// Types and constants.
+		typedef ::size_t SizeType;
+		//typedef std::vector<unsigned char>::iterator Iterator;
+		//typedef std::vector<unsigned char>::const_iterator ConstIterator;
+
+		//////////////////////////////////////////////////
+		// Accessors.
+		/** Accesses image data for given coordinate (x, y, c) by a reference. */
+		template <typename T>
+		T &operator()(SizeType x, SizeType y, SizeType c = 0);
+		template <typename T>
+		const T &operator()(SizeType x, SizeType y, SizeType c = 0) const;
+
+		/** Accesses image data for given coordinate (x, y, c) by a pointer. */
+		template <typename T>
+		T *GetPointer(SizeType x, SizeType y, SizeType c = 0);
+		template <typename T>
+		const T *GetPointer(SizeType x, SizeType y, SizeType c = 0) const;
+
+		const Size3D<SizeType> &size;
+		//const Size3D<SizeType> &size;
+
+		//////////////////////////////////////////////////
+		// Methods.
+		void CheckDepth(SizeType c) const;
+		void CheckRange(SizeType c) const;
+		void CheckRange(SizeType x, SizeType y) const;
+		void CheckRange(const Point2D<SizeType> &pt) const;
+		void CheckRange(const Point2D<SizeType> &orgn, const Size2D<SizeType> &sz) const;
+		void CheckRange(const Region<SizeType, SizeType> &roi) const;
+		void Clear(void);
+		Region<typename ImageRaw::SizeType, typename ImageRaw::SizeType> GetRoi(void) const;
+		void Resize(const Size3D<SizeType> &sz);
+		void Resize(SizeType width, SizeType height, SizeType depth = 1);
+		::size_t GetBytesPerCh(void) const;
+
+		//////////////////////////////////////////////////
+		// Data.
+		ImageFormat format;
+		ImageDataType datatype;
+
+	protected:
+		//////////////////////////////////////////////////
+		// Methods.
+		SizeType GetOffset(SizeType x, SizeType y, SizeType c = 0) const;
+
+		//////////////////////////////////////////////////
+		// Data.
+		void *data_;
+		//std::vector<unsigned char> data_;
+		Size3D<SizeType> size_;
+		//Size3D<SizeType> size_;
+		
+	};
+
 #if _MSC_VER > 1700	// from VS2013
 	template <typename T>
 	using ROI = Region<typename Image<T>::SizeType, typename Image<T>::SizeType>;
@@ -108,6 +173,21 @@ namespace Imaging
 	void Copy(const Image<T> &imgSrc,
 		const Region<typename Image<T>::SizeType, typename Image<T>::SizeType> &roiSrc,
 		Image<T> &imgDst, const Point2D<typename Image<T>::SizeType> &orgnDst);
+
+	/** Copies image data of an ROI to another image.
+
+	@NOTE destination image will be resized based on the size of the source ROI. */
+	template <typename T>
+	void Copy(const Image<T> &imgSrc,
+		const Region<typename Image<T>::SizeType, typename Image<T>::SizeType> &roiSrc,
+		Image<T> &imgDst);
+
+	/* TODO: Copies image data of an ROI to another image while converting image type from
+	one to another. */
+	template <typename T>
+	void Copy(const Image<T> &imgSrc,
+		const Region<typename Image<T>::SizeType, typename Image<T>::SizeType> &roiSrc,
+		Image<T> &imgDst, ImageFormat fmt);
 
 	/** Copies an entire image from a raw data block with zero padding.
 

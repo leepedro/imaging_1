@@ -93,6 +93,20 @@ namespace Imaging
 		return this->data.cbegin() + this->GetOffset(x, y, c);
 	}
 
+	template <typename T>
+	T *Image<T>::GetPointer(SizeType x, SizeType y, SizeType c)
+	{
+		auto it = this->GetIterator(x, y, c);
+		return &(*it);
+	}
+
+	template <typename T>
+	const T *Image<T>::GetPointer(SizeType x, SizeType y, SizeType c) const
+	{
+		auto it = this->GetIterator(x, y, c);
+		return &(*it);
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 	// Methods.
 
@@ -152,6 +166,14 @@ namespace Imaging
 	void Image<T>::CheckRange(const Region<SizeType, SizeType> &roi) const
 	{
 		this->CheckRange(roi.origin, roi.size);
+	}
+
+	template <typename T>
+	Region<typename Image<T>::SizeType, typename Image<T>::SizeType>
+		Image<T>::GetRoi(void) const
+	{
+		return Region<Image<T>::SizeType, typename Image<T>::SizeType>(0, 0, this->size.width,
+			this->size.height);
 	}
 
 	template <typename T>
@@ -252,6 +274,58 @@ namespace Imaging
 			throw std::logic_error(errMsg.str());
 		}
 	}
+
+	template <typename T>
+	void Copy(const Image<T> &imgSrc,
+		const Region<typename Image<T>::SizeType, typename Image<T>::SizeType> &roiSrc,
+		Image<T> &imgDst)
+	{
+		// Reset destination image for given dimension.
+		Size3D<typename Image<T>::SizeType> szDst(roiSrc.size.width, roiSrc.size.height, imgSrc.size.depth);
+		imgDst.resize(szDst);
+		imgDst.format = imgSrc.format;
+		const auto depth = imgSrc.size.depth;	// common for both src/dst.
+		const auto size = roiSrc.size;			// common for both roi/dst.
+
+		// Check source/destination ROI.
+		imgSrc.CheckRange(roiSrc);
+
+		// Copy line by line.
+		switch (imgSrc.format)
+		{
+		case ImageFormat::BIP:
+			{
+				auto it_src = imgSrc.GetIterator(roiSrc.origin.x, roiSrc.origin.y);
+				auto it_dst = imgDst.GetIterator(0, 0);
+				CopyLines<T>(it_src, depth * imgSrc.size.width, it_dst,
+					depth * size.width, depth * size.width, size.height);
+			}
+			break;
+		case ImageFormat::BSQ:
+			for (auto C = 0; C != imgSrc.size.depth; ++C)
+			{
+				auto it_src = imgSrc.GetIterator(roiSrc.origin.x, roiSrc.origin.y, C);
+				auto it_dst = imgDst.GetIterator(0, 0, C);
+				CopyLines<T>(it_src, imgSrc.size.width, it_dst, size.width,
+					size.width, size.height);
+			}
+			break;
+		case ImageFormat::BIL:
+			{
+				auto it_src = imgSrc.GetIterator(roiSrc.origin.x, roiSrc.origin.y);
+				auto it_dst = imgDst.GetIterator(0, 0);
+				CopyLines<T>(it_src, imgSrc.size.width, it_dst, size.width,
+					size.width,  depth * size.height);
+			}
+			break;
+		default:
+			std::ostringstream errMsg;
+			errMsg << "Image format " << static_cast<int>(imgSrc.format) <<
+				" is not supported.";
+			throw std::logic_error(errMsg.str());
+		}
+	}
+
 
 	template <typename T>
 	void Copy(const T *src, const Size3D<typename Image<T>::SizeType> &sz,

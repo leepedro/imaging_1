@@ -126,6 +126,17 @@ namespace Imaging
 		this->height = height;
 	}
 
+	/** This is a risky implementation because if there is a member variable defined in this
+	class they won't be copied from the source if the source is a derived class from
+	std::array<T, N> instead of std::array<T, N>. */
+	template <typename T>
+	Size2D<T>::Size2D(const std::array<T, 2> &src) :
+#if _MSC_VER > 1700	// from VS2013	
+		std::array<T, 2>(src), Size2D<T>() {}
+#else				// up to VS2012
+		std::array<T, 2>(src), width(at(0)), height(at(1)) {}
+#endif
+
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Size3D<T>
 
@@ -245,6 +256,14 @@ namespace Imaging
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Methods.
+
+	template <typename T, typename U>
+	bool Region<T, U>::Fit(U width, U height) const
+	{
+		return this->origin.x == 0 && this->origin.y == 0 &&
+			this->size.width == width && this->size.height == height;
+	}
+
 
 	template <typename T, typename U>
 	void Region<T, U>::Move(const Point2D<T> &dist)

@@ -1,6 +1,6 @@
 /** This file contains the test functions to test classes and functions defined in
 image.h */
-#include "../Imaging/image.h"
+#include "../Imaging/image_processing.h"
 
 #include <stdexcept>
 #include <iostream>
@@ -75,32 +75,36 @@ void TestCopyWithImage(void)
 {
 	using namespace Imaging;
 
-	cv::Mat imgSrc1 = cv::imread(std::string("Lenna.png"), CV_LOAD_IMAGE_COLOR);
+	cv::Mat cvSrc1 = cv::imread(std::string("Lenna.png"), CV_LOAD_IMAGE_COLOR);
 	cv::namedWindow(std::string("Source 1"), CV_WINDOW_AUTOSIZE);
-	cv::imshow(std::string("Source 1"), imgSrc1);
+	cv::imshow(std::string("Source 1"), cvSrc1);
 	cv::waitKey(0);
-	Size3D<::size_t> sz(imgSrc1.cols, imgSrc1.rows, imgSrc1.channels());
+	Size3D<::size_t> sz(cvSrc1.cols, cvSrc1.rows, cvSrc1.channels());
 
 	Image<unsigned char> img1;
-	Copy(imgSrc1.ptr(), sz, img1);
+	Copy(cvSrc1.ptr(), sz, img1);
 
-	int width, height, depth;
-	SafeCast(sz.height, height);
-	SafeCast(sz.width, width);
-	SafeCast(sz.depth, depth);
-	cv::Mat imgDst1(height, width, CV_8UC3, cv::Scalar(0, 0, 0));
-	Copy(img1,
-		Region<Image<unsigned char>::SizeType, Image<unsigned char>::SizeType>(0, 0, sz.width, sz.height),
-		imgDst1.ptr());
+	cv::Mat cvDst1(SafeCast_<int>(sz.height), SafeCast_<int>(sz.width), CV_8UC3, cv::Scalar(0, 0, 0));
+	Region<Image<unsigned char>::SizeType, Image<unsigned char>::SizeType> roiSrc1(0, 0, sz.width, sz.height);
+	Copy(img1, roiSrc1, cvDst1.ptr());
 	cv::namedWindow(std::string("Destination 1"), CV_WINDOW_AUTOSIZE);
-	cv::imshow(std::string("Destination 1"), imgDst1);
+	cv::imshow(std::string("Destination 1"), cvDst1);
 	cv::waitKey(0);
 
 	// Recommended way!
-	auto it_src = img1.GetIterator(0, 0);
-	cv::Mat imgDst2(height, width, CV_8UC3, &(*it_src));
+	auto it_img1 = img1.GetIterator(0, 0);
+	cv::Mat cvDst2(SafeCast_<int>(sz.height), SafeCast_<int>(sz.width), CV_8UC3, &(*it_img1));
 	cv::namedWindow(std::string("Destination 2"), CV_WINDOW_AUTOSIZE);
-	cv::imshow(std::string("Destination 2"), imgDst2);
+	cv::imshow(std::string("Destination 2"), cvDst2);
+	cv::waitKey(0);
+
+	Image<unsigned char> img2;
+	//Point2D<Image<unsigned char>::SizeType> orgn2(0, 0);
+	Resize(img1, roiSrc1, Point2D<double>(2.0, 2.0), img2);
+	auto it_img2 = img2.GetIterator(0, 0);
+	cv::Mat cvDst3(SafeCast_<int>(img2.size.height), SafeCast_<int>(img2.size.width), CV_8UC3, &(*it_img2));
+	cv::namedWindow(std::string("Resized 2"), CV_WINDOW_AUTOSIZE);
+	cv::imshow(std::string("Resized 2"), cvDst3);
 	cv::waitKey(0);
 }
 
