@@ -61,60 +61,61 @@ namespace Imaging
 	value, and maximum float value is higher than maximum integer value.
 	*/
 
+	/** DEPRECATED */
 	// 1) Negative risk only. (A & ~B)
-	template <typename T, typename U>
-	typename std::enable_if<
-		(std::is_signed<T>::value && std::is_unsigned<U>::value) &&
-		!(std::is_integral<T>::value && std::is_integral<U>::value && ((sizeof(T) > sizeof(U)) || 
-		(std::is_unsigned<T>::value && std::is_signed<U>::value && sizeof(T) == sizeof(U)))),
-		void>::type SafeCast(const T &src, U &dst)
-	{
-		if (src < 0)
-			throw std::overflow_error("Source value is negative.");
-		else
-			dst = static_cast<U>(src);
-	}
+	//template <typename T, typename U>
+	//typename std::enable_if<
+	//	(std::is_signed<T>::value && std::is_unsigned<U>::value) &&
+	//	!(std::is_integral<T>::value && std::is_integral<U>::value && ((sizeof(T) > sizeof(U)) || 
+	//	(std::is_unsigned<T>::value && std::is_signed<U>::value && sizeof(T) == sizeof(U)))),
+	//	void>::type SafeCast(const T &src, U &dst)
+	//{
+	//	if (src < 0)
+	//		throw std::overflow_error("Source value is negative.");
+	//	else
+	//		dst = static_cast<U>(src);
+	//}
 
 	// 2) Positive risk only. (~A & B)
-	template <typename T, typename U>
-	typename std::enable_if<
-		!(std::is_signed<T>::value && std::is_unsigned<U>::value) &&
-		(std::is_integral<T>::value && std::is_integral<U>::value && ((sizeof(T) > sizeof(U)) || 
-		(std::is_unsigned<T>::value && std::is_signed<U>::value && sizeof(T) == sizeof(U)))),
-		void>::type SafeCast(const T &src, U &dst)
-	{
-		if (src > static_cast<T>(std::numeric_limits<U>::max()))
-			throw std::overflow_error("Source value is too high.");
-		else
-			dst = static_cast<U>(src);
-	}
+	//template <typename T, typename U>
+	//typename std::enable_if<
+	//	!(std::is_signed<T>::value && std::is_unsigned<U>::value) &&
+	//	(std::is_integral<T>::value && std::is_integral<U>::value && ((sizeof(T) > sizeof(U)) || 
+	//	(std::is_unsigned<T>::value && std::is_signed<U>::value && sizeof(T) == sizeof(U)))),
+	//	void>::type SafeCast(const T &src, U &dst)
+	//{
+	//	if (src > static_cast<T>(std::numeric_limits<U>::max()))
+	//		throw std::overflow_error("Source value is too high.");
+	//	else
+	//		dst = static_cast<U>(src);
+	//}
 
 	// 3) Both negative and positive risks. (A & B)
-	template <typename T, typename U>
-	typename std::enable_if<
-		(std::is_signed<T>::value && std::is_unsigned<U>::value) &&
-		(std::is_integral<T>::value && std::is_integral<U>::value && ((sizeof(T) > sizeof(U)) || 
-		(std::is_unsigned<T>::value && std::is_signed<U>::value && sizeof(T) == sizeof(U)))),
-		void>::type SafeCast(const T &src, U &dst)
-	{
-		if (src < 0)
-			throw std::overflow_error("Source value is negative.");
-		else if (src > static_cast<T>(std::numeric_limits<U>::max()))
-			throw std::overflow_error("Source value is too high.");
-		else
-			dst = static_cast<U>(src);
-	}
+	//template <typename T, typename U>
+	//typename std::enable_if<
+	//	(std::is_signed<T>::value && std::is_unsigned<U>::value) &&
+	//	(std::is_integral<T>::value && std::is_integral<U>::value && ((sizeof(T) > sizeof(U)) || 
+	//	(std::is_unsigned<T>::value && std::is_signed<U>::value && sizeof(T) == sizeof(U)))),
+	//	void>::type SafeCast(const T &src, U &dst)
+	//{
+	//	if (src < 0)
+	//		throw std::overflow_error("Source value is negative.");
+	//	else if (src > static_cast<T>(std::numeric_limits<U>::max()))
+	//		throw std::overflow_error("Source value is too high.");
+	//	else
+	//		dst = static_cast<U>(src);
+	//}
 
 	// 4) No risk. (~A & ~B)
-	template <typename T, typename U>
-	typename std::enable_if<
-		!(std::is_signed<T>::value && std::is_unsigned<U>::value) &&
-		!(std::is_integral<T>::value && std::is_integral<U>::value && ((sizeof(T) > sizeof(U)) || 
-		(std::is_unsigned<T>::value && std::is_signed<U>::value && sizeof(T) == sizeof(U)))),
-		void>::type SafeCast(const T &src, U &dst)
-	{
-		dst = static_cast<U>(src);
-	}
+	//template <typename T, typename U>
+	//typename std::enable_if<
+	//	!(std::is_signed<T>::value && std::is_unsigned<U>::value) &&
+	//	!(std::is_integral<T>::value && std::is_integral<U>::value && ((sizeof(T) > sizeof(U)) || 
+	//	(std::is_unsigned<T>::value && std::is_signed<U>::value && sizeof(T) == sizeof(U)))),
+	//	void>::type SafeCast(const T &src, U &dst)
+	//{
+	//	dst = static_cast<U>(src);
+	//}
 
 	/** Casts an integer value to given another integer data type while throwing an
 	exception if an integer overflow happens.
@@ -452,7 +453,7 @@ namespace Imaging
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Global functions and operators for std::vector<T>
 
-	/** Copies repeated lines of data from an std::vector<T> to another.
+	/** Copies lines of data repeatedly from an std::vector<T> to another.
 	
 	This function is usually used to copy an ROI of data where an image is stored in an
 	std::vector<T>. */
@@ -464,7 +465,7 @@ namespace Imaging
 		typename std::vector<T>::size_type nElemWidth,
 		typename std::vector<T>::size_type nLines);
 
-	/** Copies */
+	/** Copies lines of data repeatedly from an std::vector<T> to a raw pointer. */
 	template <typename T>
 	void CopyLines(typename std::vector<T>::const_iterator it_src, ::size_t nElemPerLineSrc,
 		T *dst, ::size_t nElemPerLineDst, ::size_t nElemWidth, ::size_t nLines);

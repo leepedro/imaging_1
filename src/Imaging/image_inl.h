@@ -326,6 +326,80 @@ namespace Imaging
 		}
 	}
 
+	template <typename T>
+	void Copy(const Image<T> &imgSrc,
+		const Region<typename Image<T>::SizeType, typename Image<T>::SizeType> &roiSrc,
+		Image<T> &imgDst, ImageFormat fmt)
+	{
+		if (imgSrc.format == fmt)
+			Copy(imgSrc, roiSrc, imgDst);
+		else
+		{
+			// Reset destination image for given dimension.
+			Size3D<typename Image<T>::SizeType> szDst(roiSrc.size.width, roiSrc.size.height, imgSrc.size.depth);
+			imgDst.resize(szDst);
+			imgDst.format = fmt;
+			const auto depth = imgSrc.size.depth;	// common for both src/dst.
+			const auto size = roiSrc.size;			// common for both roi/dst.
+
+			// Check source/destination ROI.
+			imgSrc.CheckRange(roiSrc);
+
+			// Copy line by line.
+			switch (imgSrc.format)
+			{
+			case ImageFormat::BIP:
+				switch (fmt)
+				{
+					case ImageFormat::BSQ:
+						// TODO: Copy lines for selective channels only.
+						break;
+					case ImageFormat::BIL:
+
+						break;
+					default:
+						std::ostringstream errMsg;
+						errMsg << "Image format " << static_cast<int>(fmt) <<
+							" is not supported.";
+						throw std::logic_error(errMsg.str());
+				}
+				break;
+			case ImageFormat::BSQ:
+				switch (fmt)
+				{
+					case ImageFormat::BIP:
+						break;
+					case ImageFormat::BIL:
+						break;
+					default:
+						std::ostringstream errMsg;
+						errMsg << "Image format " << static_cast<int>(fmt) <<
+							" is not supported.";
+						throw std::logic_error(errMsg.str());
+				}
+				break;
+			case ImageFormat::BIL:
+				switch (fmt)
+				{
+					case ImageFormat::BIP:
+						break;
+					case ImageFormat::BSQ:
+						break;
+					default:
+						std::ostringstream errMsg;
+						errMsg << "Image format " << static_cast<int>(fmt) <<
+							" is not supported.";
+						throw std::logic_error(errMsg.str());
+				}
+				break;
+			default:
+				std::ostringstream errMsg;
+				errMsg << "Image format " << static_cast<int>(imgSrc.format) <<
+					" is not supported.";
+				throw std::logic_error(errMsg.str());
+			}
+		}
+	}
 
 	template <typename T>
 	void Copy(const T *src, const Size3D<typename Image<T>::SizeType> &sz,
