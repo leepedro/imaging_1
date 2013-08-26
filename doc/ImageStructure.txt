@@ -46,7 +46,7 @@ measurement. I = I(t) where t = 0.
 Any data set for computation in memory or visualization on screens, e.g., bitmap image data.
 This structure should not be tied to any sensor and should not contain meta data blocks.
 Data could be a single measurement or multiple measurements. I = I(t) where t = {0, ..., N}.
-Data is ALWAYS stored as CHANNEL -> column -> row -> FRAME.
+Data is ALWAYS stored as CHANNEL -> pixel (column) -> line (row) -> FRAME.
 Channel usually corresponds to the band in BIP sensor data.
 Frame usually corresponds to the band in BSQ sensor data or time in movie data.
 The number of channels is usually limited (up to 4) and fixed while the number of frames is

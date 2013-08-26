@@ -135,6 +135,7 @@
     <ClInclude Include="coordinates.h" />
     <ClInclude Include="coordinates_inl.h" />
     <ClInclude Include="image.h" />
+    <ClInclude Include="image2.h" />
     <ClInclude Include="image_inl.h" />
     <ClInclude Include="image_processing.h" />
     <ClInclude Include="image_processing_inl.h" />
