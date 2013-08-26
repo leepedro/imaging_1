@@ -9,14 +9,14 @@ namespace Imaging
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Default constructors.
 	template <typename T>
-	Point2D<T>::Point2D(void) : x(at(0)), y(at(1)) {}
+	Point2D<T>::Point2D(void) : x(this->at(0)), y(this->at(1)) {}
 
 	template <typename T>
 	Point2D<T>::Point2D(const Point2D &src) :
 #if _MSC_VER > 1700	// from VS2013	
 		std::array<T, 2>(src), Point2D<T>() {}
 #else				// up to VS2012
-		std::array<T, 2>(src), x(at(0)), y(at(1)) {}
+		std::array<T, 2>(src), x(this->at(0)), y(this->at(1)) {}
 #endif
 
 	template <typename T>
@@ -33,7 +33,7 @@ namespace Imaging
 #if _MSC_VER > 1700	// from VS2013
 		Point2D<T>()
 #else				// up to VS2012
-		x(at(0)), y(at(1))
+		x(this->at(0)), y(this->at(1))
 #endif
 	{
 		this->x = x;
@@ -48,7 +48,7 @@ namespace Imaging
 #if _MSC_VER > 1700	// from VS2013	
 		std::array<T, 2>(src), Point2D<T>() {}
 #else				// up to VS2012
-		std::array<T, 2>(src), x(at(0)), y(at(1)) {}
+		std::array<T, 2>(src), x(this->at(0)), y(this->at(1)) {}
 #endif
 
 	////////////////////////////////////////////////////////////////////////////////////////
@@ -57,14 +57,14 @@ namespace Imaging
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Default constructors.
 	template <typename T>
-	Point3D<T>::Point3D(void) : x(at(0)), y(at(1)), z(at(2)) {}
+	Point3D<T>::Point3D(void) : x(this->at(0)), y(this->at(1)), z(this->at(2)) {}
 
 	template <typename T>
 	Point3D<T>::Point3D(const Point3D<T> &src) :
 #if _MSC_VER > 1700	// from VS2013	
 		std::array<T, 3>(src), Point3D<T>() {}
 #else				// up to VS2012
-		std::array<T, 3>(src), x(at(0)), y(at(1)), z(at(2)) {}
+		std::array<T, 3>(src), x(this->at(0)), y(this->at(1)), z(this->at(2)) {}
 #endif
 
 	template <typename T>
@@ -81,7 +81,7 @@ namespace Imaging
 #if _MSC_VER > 1700	// from VS2013
 		Point3D<T>()
 #else				// up to VS2012
-		x(at(0)), y(at(1)), z(at(2))
+		x(this->at(0)), y(this->at(1)), z(this->at(2))
 #endif
 	{
 		this->x = x;
@@ -95,14 +95,14 @@ namespace Imaging
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Default constructors.
 	template <typename T>
-	Size2D<T>::Size2D(void) : width(at(0)), height(at(1)) {}
+	Size2D<T>::Size2D(void) : width(this->at(0)), height(this->at(1)) {}
 
 	template <typename T>
 	Size2D<T>::Size2D(const Size2D &src) :
 #if _MSC_VER > 1700	// from VS2013	
 		std::array<T, 2>(src), Size2D<T>() {}
 #else				// up to VS2012
-		std::array<T, 2>(src), width(at(0)), height(at(1)) {}
+		std::array<T, 2>(src), width(this->at(0)), height(this->at(1)) {}
 #endif
 
 	template <typename T>
@@ -119,7 +119,7 @@ namespace Imaging
 #if _MSC_VER > 1700	// from VS2013
 		Size2D<T>()
 #else				// up to VS2012
-		width(at(0)), height(at(1))
+		width(this->at(0)), height(this->at(1))
 #endif
 	{
 		this->width = width;
@@ -134,7 +134,7 @@ namespace Imaging
 #if _MSC_VER > 1700	// from VS2013	
 		std::array<T, 2>(src), Size2D<T>() {}
 #else				// up to VS2012
-		std::array<T, 2>(src), width(at(0)), height(at(1)) {}
+		std::array<T, 2>(src), width(this->at(0)), height(this->at(1)) {}
 #endif
 
 	////////////////////////////////////////////////////////////////////////////////////////
@@ -143,14 +143,14 @@ namespace Imaging
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Default constructors.
 	template <typename T>
-	Size3D<T>::Size3D(void) : width(at(0)), height(at(1)), depth(at(2)) {}
+	Size3D<T>::Size3D(void) : width(this->at(0)), height(this->at(1)), depth(this->at(2)) {}
 
 	template <typename T>
 	Size3D<T>::Size3D(const Size3D<T> &src) :
 #if _MSC_VER > 1700	// from VS2013	
 		std::array<T, 3>(src), Size3D<T>() {}
 #else				// up to VS2012
-		std::array<T, 3>(src), width(at(0)), height(at(1)), depth(at(2)) {}
+		std::array<T, 3>(src), width(this->at(0)), height(this->at(1)), depth(this->at(2)) {}
 #endif
 
 	template <typename T>
@@ -167,7 +167,7 @@ namespace Imaging
 #if _MSC_VER > 1700	// from VS2013
 		Size3D<T>()
 #else				// up to VS2012
-		width(at(0)), height(at(1)), depth(at(2))
+		width(this->at(0)), height(this->at(1)), depth(this->at(2))
 #endif
 	{
 		this->width = width;

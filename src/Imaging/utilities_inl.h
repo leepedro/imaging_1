@@ -144,6 +144,7 @@ namespace Imaging
 	}
 
 	// Implemented stdext::checked_array_iterator<> class to bypass C4996 warning.
+#if defined(WIN32)
 	template <typename T>
 	void CopyLines(typename std::vector<T>::const_iterator it_src, ::size_t nElemPerLineSrc,
 		T *dst, ::size_t nElemPerLineDst, ::size_t nElemWidth, ::size_t nLines)
@@ -156,6 +157,7 @@ namespace Imaging
 			dst += nElemPerLineDst;
 		}
 	}
+#endif
 }
 
 #endif
