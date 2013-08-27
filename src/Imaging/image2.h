@@ -45,11 +45,14 @@ namespace Imaging
 	band -> channel, column -> pixel, row -> line
 	*/
 	/* ImageStorage to ImageBlock
-	if band -> channel: band -> channel, column -> pixel, row -> line, frame = 1
+	if band -> channel: band -> channel, column -> pixel, row -> line, frame = 1 (no need?)
 	if band -> frame: channel = 1, column -> pixel, row -> line, band -> frame
 	*/
 	/* ImageStorage[t] to ImageBlock
 	band -> channel, column -> pixel, row -> line, t -> frame
+	*/
+	/* ImageStorage[t] to ImageBlock[b]
+	channel = 1, column -> pixel, row -> line, t -> frame, band -> b
 	*/
 
 	// Processing to storage
@@ -57,7 +60,7 @@ namespace Imaging
 	channel -> band, pixel -> column, line -> row
 	*/
 	/* ImageBlock to ImageStorage
-	if frame = 1, channel -> band: channel -> band, pixel -> column, line -> row
+	if frame = 1, channel -> band: channel -> band, pixel -> column, line -> row (for each frame)
 	if channel = 1, frame -> band: frame -> band, pixel -> column, line -> row
 	*/
 	/* ImageBlock to ImageStorage[t]
