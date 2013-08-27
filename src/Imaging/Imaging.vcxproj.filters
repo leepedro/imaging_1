@@ -45,6 +45,9 @@
     <ClInclude Include="image2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="image2_inl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="image_processing.cpp">

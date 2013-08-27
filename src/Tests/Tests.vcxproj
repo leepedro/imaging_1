@@ -148,6 +148,7 @@
     <ClCompile Include="tests.cpp" />
     <ClCompile Include="test_coordinates.cpp" />
     <ClCompile Include="test_image.cpp" />
+    <ClCompile Include="test_image_frame.cpp" />
     <ClCompile Include="test_utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
