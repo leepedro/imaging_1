@@ -21,15 +21,15 @@ namespace Imaging
 #endif
 		data_(src.data) { size_ = src.size; }
 
-	template <typename T>
-	ImageFrame<T>::ImageFrame(ImageFrame<T> &&src) :
-#if _MSC_VER > 1700	// from VS2013
-		Image<T>(),
-#else				// up to VS2012
-		data(data_), size(size_),
-#endif
-		// TODO: Next line won't work because src.data is const &!!!
-		data_(std::move(src.data)) { size_ = src.size; }
+//	template <typename T>
+//	ImageFrame<T>::ImageFrame(ImageFrame<T> &&src) :
+//#if _MSC_VER > 1700	// from VS2013
+//		Image<T>(),
+//#else				// up to VS2012
+//		data(data_), size(size_),
+//#endif
+//		// TODO: Next line won't work because src.data is const &!!!
+//		data_(std::move(src.data)) { size_ = src.size; }
 
 	template <typename T>
 	ImageFrame<T> &ImageFrame<T>::operator=(const ImageFrame<T> &src)
@@ -39,13 +39,13 @@ namespace Imaging
 		return *this;
 	}
 
-	template <typename T>
-	ImageFrame<T> &ImageFrame<T>::operator=(ImageFrame<T> &&src)
-	{
-		this->data_ = std::move(src.data);
-		this->size_ = std::move(src.size);
-		return *this;
-	}
+	//template <typename T>
+	//ImageFrame<T> &ImageFrame<T>::operator=(ImageFrame<T> &&src)
+	//{
+	//	this->data_ = std::move(src.data);
+	//	this->size_ = std::move(src.size);
+	//	return *this;
+	//}
 
 	//////////////////////////////////////////////////////////////////////////
 	// Custom constructors.

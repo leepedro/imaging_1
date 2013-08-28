@@ -35,9 +35,9 @@ namespace Imaging
 		// Default constructors.
 		ImageFrame(void);
 		ImageFrame(const ImageFrame<T> &src);
-		ImageFrame(ImageFrame<T> &&src);
+		//ImageFrame(ImageFrame<T> &&src);
 		ImageFrame<T> &operator=(const ImageFrame<T> &src);
-		ImageFrame<T> &operator=(ImageFrame<T> &&src);
+		//ImageFrame<T> &operator=(ImageFrame<T> &&src);
 
 		//////////////////////////////////////////////////
 		// Custom constructors.
