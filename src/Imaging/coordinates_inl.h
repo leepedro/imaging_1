@@ -257,12 +257,12 @@ namespace Imaging
 	////////////////////////////////////////////////////////////////////////////////////////
 	// Methods.
 
-	template <typename T, typename U>
-	bool Region<T, U>::Fit(U width, U height) const
-	{
-		return this->origin.x == 0 && this->origin.y == 0 &&
-			this->size.width == width && this->size.height == height;
-	}
+	//template <typename T, typename U>
+	//bool Region<T, U>::Fit(U width, U height) const
+	//{
+	//	return this->origin.x == 0 && this->origin.y == 0 &&
+	//		this->size.width == width && this->size.height == height;
+	//}
 
 
 	template <typename T, typename U>

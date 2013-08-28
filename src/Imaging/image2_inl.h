@@ -28,7 +28,8 @@ namespace Imaging
 #else				// up to VS2012
 		data(data_), size(size_),
 #endif
-		data_(std::move(src.data)) { size_ = std::move(src.size); }
+		// TODO: Next line won't work because src.data is const &!!!
+		data_(std::move(src.data)) { size_ = src.size; }
 
 	template <typename T>
 	ImageFrame<T> &ImageFrame<T>::operator=(const ImageFrame<T> &src)

@@ -12,6 +12,8 @@ namespace Imaging
 	but they should not have any member variables.
 	If it does, the member variable will be discarded by the operators or methods defined
 	for std::array<T, N>. */
+	/* Since std::array<T, N> class does not have move constructor, the inherited classes
+	shall not have a move constructor. */
 
 	/** Presents a 2-D Cartesian coordinate as (x, y). */
 	template <typename T>
@@ -147,7 +149,7 @@ namespace Imaging
 		////////////////////////////////////////////////////////////////////////////////////
 		// Methods.
 
-		bool Fit(U width, U height) const;
+		//bool Fit(U width, U height) const;
 
 		/** Moves the origin by the given distance. */
 		void Move(const Point2D<T> &dist);

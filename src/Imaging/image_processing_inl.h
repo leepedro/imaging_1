@@ -31,8 +31,9 @@ namespace Imaging
 		const Region<typename Image<T>::SizeType, typename Image<T>::SizeType> &roiSrc,
 		const Point2D<double> &zm, Image<T> &imgDst, Interpolation interp)
 	{
-
-		if (roiSrc.Fit(imgSrc.size.width, imgSrc.size.height))
+		if (roiSrc.size.width == imgSrc.size.width && roiSrc.size.height == imgSrc.size.height)
+		//if (roiSrc.size == imgSrc.size)
+		//if (roiSrc.Fit(imgSrc.size.width, imgSrc.size.height))
 			Resize(imgSrc, zm, imgDst, interp);
 		else
 		{
